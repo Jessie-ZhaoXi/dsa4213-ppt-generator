@@ -12,5 +12,16 @@ Or install dependencies with `poetry`
 # poetry export --without-hashes --format=requirements.txt > requirements.txt
 poetry install
 ```
+
+### Running Wave App
+
+run:
+
+```sh
+wave run app.py
+```
+
+Which will start a Wave app at <http://localhost:10101>.
+
 ### For developers
 before commit the python code, the developer can use `make format` command for the auto code formatting.
