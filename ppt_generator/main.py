@@ -1,14 +1,21 @@
 from h2ogpte import H2OGPTE
-from markdown_generator import MarkdownGenerator
-from pdf_reader import ingest_documents
-from utils import save_md
+from md2ppt.ppt_generator import PptGenerator
+from utils import *
 
-from config import API_KEY, PDF_PATH, PPT_DIR, REMOTE_ADDRESS
+from ppt_generator.config import *
+from ppt_generator.content_generator.markdown_generator import MarkdownGenerator
+from ppt_generator.content_generator.pdf_reader import ingest_documents
+from ppt_generator.md2ppt.markdown_parser import parse_str
+
+"""
+This script demonstrates how to use the h2ogpte Python client to generate a PowerPoint presentation from a PDF file.
+"""
 
 task_name = "attention"  # place holder
 
-if __name__ == "__main__":
 
+def main():
+    # Connect to the server
     client = H2OGPTE(address=REMOTE_ADDRESS, api_key=API_KEY)
     collection_id = None
     name = "h2ogpte Python client demo"
@@ -41,5 +48,16 @@ if __name__ == "__main__":
         save_md(content, f"{PPT_DIR}{task_name}.md")
 
     # Generate the ppt
-    # ppt_gen = PptGenerator()
-    # ppt_gen.generate_ppt(content, "./my_ppts/{}.pptx")
+    md_content = read_md_file("./data/" + task_name + ".md")
+    out = parse_str(md_content)
+
+    for i in range(1, 3):  # generate two modes of ppt
+        PptGenerator(
+            md_content,
+            PPT_MODE_DIR + str(i),
+            save_path=PPT_DIR + task_name + "_mode" + str(i) + ".pptx",
+        )
+
+
+if __name__ == "__main__":
+    main()
