@@ -15,16 +15,6 @@ def ask_llm(session: Session, question: str, llm: str = "gpt-4-1106-preview"):
     return ans
 
 
-# customized error
-class API_Type_Error(Exception):
-    def __init__(self, ErrorInfo):
-        super().__init__(self)
-        self.errorinfo = ErrorInfo
-
-    def __str__(self):
-        return self.errorinfo
-
-
 class MarkdownGenerator:
 
     def __init__(
