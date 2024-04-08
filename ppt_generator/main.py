@@ -48,7 +48,7 @@ def main():
         save_md(content, f"{PPT_DIR}{task_name}.md")
 
     # Generate the ppt
-    md_content = read_md_file("./data/" + task_name + ".md")
+    md_content = read_md_file(PPT_DIR + task_name + ".md")
     out = parse_str(md_content)
 
     for i in range(1, 3):  # generate two modes of ppt
