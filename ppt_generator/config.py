@@ -14,7 +14,12 @@ API_KEY = ""
 REMOTE_ADDRESS = "https://h2ogpte.genai.h2o.ai"
 PDF_PATH = "./data/attention.pdf"
 PPT_DIR = "./my_ppts/"
-PPT_MODE_DIR = "./ppt_generator/ppt_mode/"
+PPT_MODE_DIR = "./ppt_mode/"
+LLM_ARGS = dict(
+              temperature=0,
+              do_sample = False,
+              top_k = 1,
+              seed = 4213)
 
 
 # class Settings(BaseSettings):

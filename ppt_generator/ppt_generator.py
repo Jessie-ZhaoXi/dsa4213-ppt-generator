@@ -14,9 +14,9 @@ from pptx.slide import Slide
 from pptx.text.text import Font
 from pptx.util import Cm, Inches, Pt
 
-from ppt_generator.content_generator.img_search import get_img
-from ppt_generator.md2ppt.markdown_parser import Heading, Out, parse_str
-from ppt_generator.utils import get_random_file
+#from ppt_generator.content_generator.img_search import get_img
+from markdown_parser import Heading, Out, parse_str
+from utils import get_random_file
 
 """
 This module contains the PptGenerator class, which is used to convert a markdown string into a PowerPoint presentation.

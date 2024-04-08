@@ -1,9 +1,47 @@
-from spire.pdf import *
+import os
+import pathlib
+#from spire.pdf import *
 import re
+from h2ogpte import H2OGPTE
+
+
+def ingest_documents(
+    client: H2OGPTE,
+    collection_name: str,
+    collection_id: str,
+    pdf_path: str,
+    is_local: bool = True,
+):
+    """
+    Ingests documents into the H2OGPTE client.
+    """
+    # Upload file into collection
+    #pdf_reader = PDF_Reader()
+    #text_output_path, image_output_folder = '', ''
+    #pdf_reader.extract_text_and_image(text_output_path, image_output_folder)
+    text_path = 'data/attention.txt'
+
+
+    file_path = (
+        pathlib.Path(os.path.basename(text_path))
+        if not is_local
+        else pathlib.Path(text_path)
+    )
+    with open(file_path.resolve(), "rb") as f:
+        print(
+            f"Uploading {file_path} to collection {collection_name} ({collection_id})"
+        )
+        upload_id = client.upload(file_path.name, f)
+
+    print("Converting the input into chunked text and embeddings...")
+    client.ingest_uploads(collection_id, [upload_id])
+    print(f"DONE: {collection_id}")
+    return collection_id
 
 class PDF_Reader:
   def __init__(self):
-    self.doc = PdfDocument()
+    #self.doc = PdfDocument()
+    pass
 
   def load_pdf(self, path):
     self.doc.LoadFromFile(path)

@@ -2,12 +2,14 @@ from typing import Optional
 
 from h2ogpte import Session
 from utils import get_sublist, save_md
+from config import LLM_ARGS
 
 
-def ask_llm(session: Session, question: str, llm: str = "gpt-4-1106-preview"):
+def ask_llm(session: Session, question: str, llm: str = "gpt-4-1106-preview", llm_args = LLM_ARGS):
     ans = session.query(
         message=question,
         llm=llm,
+        llm_args =llm_args,
         rag_config={
             "rag_type": "rag",
         },
