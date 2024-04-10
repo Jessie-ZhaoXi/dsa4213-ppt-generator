@@ -12,5 +12,23 @@ Or install dependencies with `poetry`
 # poetry export --without-hashes --format=requirements.txt > requirements.txt
 poetry install
 ```
+
+### Getting the API keys
+If you do not have an existing API key:
+    Go to https://h2ogpte.genai.h2o.ai/settings, > APIs Tab, click 'New API key'
+
+Save the API key and address to your enviornmental variables
+```
+export H2OGPTE_API_TOKEN='YOUR_KEY'
+```
+
+```
+export H2OGPTE_URL=https://h2ogpte.genai.h2o.ai  
+```
+
+To run the wave app, check that your present working directory is at /frontend_explore
+```
+wave run src/app.py
+```
 ### For developers
 before commit the python code, the developer can use `make format` command for the auto code formatting.

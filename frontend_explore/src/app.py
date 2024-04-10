@@ -3,11 +3,12 @@ import os
 import logging
 from pathlib import Path
 import requests
-from .texts_app import texts_app_ptbr, texts_app_en
-from .doc_qna_h2ogpte import QnAManager, H2OGPTEClient
-from .utils import loading
-from .constants import *
-from .layout import get_header_card, layout, get_home_items
+from src.texts_app import texts_app_ptbr, texts_app_en
+print(texts_app_en)
+from src.doc_qna_h2ogpte import QnAManager, H2OGPTEClient
+from src.utils import loading
+from src.constants import *
+from src.layout import get_header_card, layout, get_home_items
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,7 +25,7 @@ async def serve(q: Q):
     if not q.client.initialized:
         logging.info("New client session started.")
         q.client.texts = texts_app_ptbr
-        q.client.language = 'ptbr'
+        q.client.language = 'en' # or 'ptbr'
         await layout(q)
         await get_home_items(q, flag="home")
         await q.page.save()
