@@ -12,8 +12,8 @@ from src.layout import get_header_card, layout, get_home_items
 
 logging.basicConfig(level=logging.INFO)
 
-name_collection_temas='temas_stf'
-description_collection_temas="Temas STF"
+collection_name='supersonic_rocket_ppt_generator'
+collection_description="created for DSA4213 project"
 
 llm = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
@@ -24,7 +24,7 @@ async def serve(q: Q):
         q.app.initialized = True
     if not q.client.initialized:
         logging.info("New client session started.")
-        q.client.texts = texts_app_ptbr
+        q.client.texts = texts_app_en
         q.client.language = 'en' # or 'ptbr'
         await layout(q)
         await get_home_items(q, flag="home")
@@ -42,20 +42,24 @@ async def initialize_app(q):
                 "api_key": os.getenv("H2OGPTE_API_TOKEN"),
             }
     q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
-    q.app.collection_temas_id = q.app.h2ogpte.create_collection(name_collection_temas, description_collection_temas)
-    # q.app.h2ogpte.ingest_file_folder('temas_stf', q.app.collection_temas_id)
-    q.app.loader, = await q.site.upload(['./static/loader_legal.gif'])
+    q.app.collection_id = q.app.h2ogpte.create_collection(collection_name, collection_description)
+    # q.app.h2ogpte.ingest_file_folder('temas_stf', q.app.collection_id)
+    q.app.loader, = await q.site.upload([LOADING_GIF])
     q.app.logo, = await q.site.upload([COMPANY_LOGO])
     q.app.backgroud, = await q.site.upload([BACKGROUND_IMAGE])
 
 
 @on()
-async def chatbot_brlaw(q: Q):
-    await on_generating(q, q.client.chatbot_brlaw)
+async def chatbot(q: Q):
+    await on_generating(q, q.client.chatbot)
 
 
 @on()
 async def questions(q: Q):
+    '''
+    triggers on_generating function, which initiates a H20GPTE client instanc.
+    returns the Response.
+    '''
     data = q.client.texts['questions_data']
     question_prompt = data['Question'][int(q.client.questions[0])]
     await on_generating(q, question_prompt)
@@ -63,7 +67,7 @@ async def questions(q: Q):
 
 async def on_generating(q, question_prompt):
     q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
-    q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_peticao_id, q.app.collection_temas_id, q.client.language)
+    q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)
     q.page["card_1"].data += [question_prompt, True]
     await q.page.save()
     output = await q.run(q.client.qnamanager.answer_question, q, question_prompt, q.client.path)
@@ -77,57 +81,77 @@ async def set_english(q: Q):
     await q.page.save()
 
 
-@on(arg='Chinese')
-async def set_portuguese(q: Q):
-    q.client.texts = texts_app_ptbr
-    q.client.language = 'cn'
-    await get_home_items(q, flag="home")
-    await q.page.save()
+# @on(arg='Chinese')
+# async def set_portuguese(q: Q):
+#     q.client.texts = texts_app_ptbr
+#     q.client.language = 'cn'
+#     await get_home_items(q, flag="home")
+#     await q.page.save()
+
+# @on()
+# async def submit_url(q: Q):
+#     if q.client.url == "":
+#         await get_home_items(q, flag="home")
+#         await q.page.save()
+#     else:
+#         try:
+#             filename = q.client.url.split("/")[-1]
+#             q.client.path = Path('pdf/' + filename)
+#             await loading(q)
+#             response = requests.get(q.client.url)
+#             q.client.path.write_bytes(response.content)
+#             name_collection_peticao = f'collection_{filename}'
+#             description_collection_peticao = f'Collection for {filename}'
+#             q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
+#             q.client.collection_request_id = q.app.h2ogpte.create_collection(name_collection_peticao, description_collection_peticao)
+#             q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)
+#             await q.run(q.app.h2ogpte.ingest_url, q.client.url, q.client.collection_request_id)
+#             q.page['meta'].dialog = None
+#             await get_home_items(q, flag="uploaded")
+#             await q.page.save()
+#             delete_filepath(q.client.path)
+#         except:
+#             await get_home_items(q, flag="home")
+#             await q.page.save()
+
 
 @on()
-async def submit_url(q: Q):
-    if q.client.url == "":
-        await get_home_items(q, flag="home")
-        await q.page.save()
-    else:
-        try:
-            filename = q.client.url.split("/")[-1]
-            q.client.path = Path('pdf/' + filename)
-            await loading(q)
-            response = requests.get(q.client.url)
-            q.client.path.write_bytes(response.content)
-            name_collection_peticao = f'collection_{filename}'
-            description_collection_peticao = f'Collection for {filename}'
-            q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
-            q.client.collection_peticao_id = q.app.h2ogpte.create_collection(name_collection_peticao, description_collection_peticao)
-            q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_peticao_id, q.app.collection_temas_id, q.client.language)
-            await q.run(q.app.h2ogpte.ingest_url, q.client.url, q.client.collection_peticao_id)
-            q.page['meta'].dialog = None
-            await get_home_items(q, flag="uploaded")
-            await q.page.save()
-            delete_filepath(q.client.path)
-        except:
-            await get_home_items(q, flag="home")
-            await q.page.save()
-
-
-@on()
-async def submit_demo(q: Q):
+async def file_upload(q: Q):
     try:
-        filename = q.client['initial_petition_demo']
-        q.client.path = Path('./demo_files/' + filename)
-        await loading(q)
-        q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
-        q.client.collection_peticao_id = q.app.h2ogpte.create_collection(f'collection_{filename}', f'Collection for {filename}')
-        q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_peticao_id, q.app.collection_temas_id, q.client.language)
-        await q.run(q.app.h2ogpte.ingest_filepath, q.client.path, q.client.collection_peticao_id)
-        q.page['meta'].dialog = None
-        await get_home_items(q, flag="uploaded")
+        paths = q.client['file_upload']
+        print(f'Received file upload paths are {paths}.')
+        if paths:
+            for path in paths:
+                local_path = await q.site.download(path, './uploaded_files')
+                print(f'******######downloaded:{local_path}')
+                q.client.path = local_path
+                q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
+                q.client.collection_request_id = q.app.h2ogpte.create_collection(f'collection_{path}', f'Collection for {path}')
+                q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)
+                await q.run(q.app.h2ogpte.ingest_filepath, q.client.path, q.client.collection_request_id)
+                await get_home_items(q, flag="uploaded")
         await q.page.save()
     except:
-        q.page['meta'].dialog = None
-        await get_home_items(q, flag="home")
-        await q.page.save()
+          q.page['meta'].dialog = None
+          await get_home_items(q, flag="home")
+          await q.page.save()
+
+    # try:
+    #     filename = q.client['file_upload']
+    #     print(f'******{filename}')
+    #     q.client.path = Path('./uploaded_files/' + filename)
+    #     await loading(q)
+    #     q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
+    #     q.client.collection_request_id = q.app.h2ogpte.create_collection(f'collection_{filename}', f'Collection for {filename}')
+    #     q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)
+    #     await q.run(q.app.h2ogpte.ingest_filepath, q.client.path, q.client.collection_request_id)
+    #     q.page['meta'].dialog = None
+    #     await get_home_items(q, flag="uploaded")
+    #     await q.page.save()
+    # except:
+    #     q.page['meta'].dialog = None
+    #     await get_home_items(q, flag="home")
+    #     await q.page.save()
 
 
 @on()

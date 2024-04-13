@@ -115,10 +115,15 @@ def get_sidebar(q):
     sidebar_text = q.client.texts['sidebar']
     items = [
         ui.text(text_heading.format(sidebar_text['heading'])),
-        ui.dropdown(name='initial_petition_demo',
-                    label=sidebar_text['sub_heading'],
-                    choices=[ui.choice(name=filename, label=filename) for filename in filenames]),
-        ui.button(name='submit_demo', label=sidebar_text['label'], primary=True, icon='Upload'),
+        # ui.dropdown(name='initial_petition_demo',
+        #             label=sidebar_text['sub_heading'],
+        #             choices=[ui.choice(name=filename, label=filename) for filename in filenames]),
+        # ui.button(name='submit_demo', label=sidebar_text['label'], primary=True, icon='Upload'),
+        ui.file_upload(
+            name='file_upload', 
+            label='Upload your documents', 
+            file_extensions=['pdf'],
+            multiple=True),
         ui.separator(),
         # ui.text(text_heading.format(sidebar_text['heading_2'])),
         # ui.textbox(name='url', label=sidebar_text['label_2'], required=True),

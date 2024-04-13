@@ -109,16 +109,16 @@ class H2OGPTEClient:
             logging.info(f'File {filename} already ingested')
         return
     
-    def ingest_url(self, url, collection_id):
-        filename = url.split("/")[-1]
-        documents = self.client.list_documents_in_collection(collection_id, 0, 1000)
-        document_ids = [d.id for d in documents if d.name == filename]
-        if len(document_ids) == 0:
-            self.client.ingest_website(collection_id, url)
-            logging.info(f'File {filename} ingested')
-        else:
-            logging.info(f'File {filename} already ingested')
-        return
+    # def ingest_url(self, url, collection_id):
+    #     filename = url.split("/")[-1]
+    #     documents = self.client.list_documents_in_collection(collection_id, 0, 1000)
+    #     document_ids = [d.id for d in documents if d.name == filename]
+    #     if len(document_ids) == 0:
+    #         self.client.ingest_website(collection_id, url)
+    #         logging.info(f'File {filename} ingested')
+    #     else:
+    #         logging.info(f'File {filename} already ingested')
+    #     return
     
     def _get_collection_chunks(self, collection_id):
         chunk_sizes = 80
@@ -156,11 +156,11 @@ class H2OGPTEClient:
 
 
 class QnAManager:
-    def __init__(self, client, llm, collection_peticao_id, collection_stf_id, language):
+    def __init__(self, client, llm, collection_request_id, collection_stf_id, language):
         from .prompts import prompts_pt, prompts_eng
         self.client = client.client
         self.llm = llm
-        self.collection_peticao_id = collection_peticao_id
+        self.collection_request_id = collection_request_id
         self.collection_stf_id = collection_stf_id
         self.prompts = prompts_pt if language == 'ptbr' else prompts_eng
         self.language = language
@@ -230,7 +230,7 @@ class QnAManager:
             """
             q.client.chatbot_interaction.update_response(message, q)
 
-        collection = self.collection_peticao_id
+        collection = self.collection_request_id
         if stf_check == True: collection = self.collection_stf_id
         chat_session_id = self.client.create_chat_session(collection)
         args = {
@@ -292,7 +292,7 @@ class QnAManager:
             await q.page.save()
             check_exist, res = self._check_history(filename, delete_old)
             if check_exist==False:
-                res = self._get_full_summary(self.collection_peticao_id)
+                res = self._get_full_summary(self.collection_request_id)
                 if not res.startswith('Not able to construct an answer at the moment.'):
                     summary_task = True
             cfg['summary'] = res.replace('"', "'")
@@ -301,7 +301,7 @@ class QnAManager:
         elif stf_temas_check_func(question_prompt):
             check_exist, summary = self._check_history(filename, delete_old)
             if check_exist==False:
-                summary = self._get_full_summary(self.collection_peticao_id)
+                summary = self._get_full_summary(self.collection_request_id)
                 if not summary.startswith('Not able to construct an answer at the moment.'):
                     summary_task = True
             question_prompt = self.prompts['stf_tema_prompt'].format(summary)
