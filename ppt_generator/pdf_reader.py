@@ -95,7 +95,7 @@ class PDF_Reader:
 
       answer = client.answer_question(llm_args = LLM_ARGS,question= question.format(description), llm=llm).content
       
-      pattern = r'\d+\.\s*"([^"]+)'
+      pattern = r'\d+\.\s*(.*?)(?:\n|$)'
 
       # Find all matches in the text
       matches = re.findall(pattern, answer)
