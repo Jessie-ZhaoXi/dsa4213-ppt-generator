@@ -13,7 +13,6 @@ This script demonstrates how to use the h2ogpte Python client to generate a Powe
 
 task_name = "attention"  # place holder
 
-
 def main():
     # Connect to the server
     client = H2OGPTE(address=REMOTE_ADDRESS, api_key=API_KEY)
@@ -45,23 +44,19 @@ def main():
     with client.connect(chat_session_id) as session:
         # Generate the summary
         article_md = MarkdownGenerator(session)
-        content = article_md.generate_md_artical()
-        if not os.path.exists(PPT_DIR):
-            # If it doesn't exist, create it
-            os.makedirs(PPT_DIR)
-            print(f"Directory '{PPT_DIR}' created successfully.")
-        save_md(content, f"{PPT_DIR}{task_name}.md")
+        article_md.generate_md_artical(save_path= MD_DIR, instruction= "")
+        md_content = combine_mds(MD_DIR, task_name)
 
     # Generate the ppt
-    md_content = read_md_file(PPT_DIR + task_name + ".md")
     out = parse_str(md_content)
-
+    
     for i in range(1, 3):  # generate two modes of ppt
         PptGenerator(
             md_content,
             PPT_MODE_DIR + str(i),
             save_path=PPT_DIR + task_name + "_mode" + str(i) + ".pptx",
         )
+    
 
 
 if __name__ == "__main__":
