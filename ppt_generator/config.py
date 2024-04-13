@@ -12,6 +12,7 @@ from pydantic_settings import BaseSettings
 
 API_KEY = ""
 REMOTE_ADDRESS = "https://h2ogpte.genai.h2o.ai"
+MD_DIR = "./my_mds/"
 PDF_PATH = "./data/attention.pdf"
 PPT_DIR = "./my_ppts/"
 PPT_MODE_DIR = "./ppt_mode/"
