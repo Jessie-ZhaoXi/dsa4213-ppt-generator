@@ -95,7 +95,7 @@ class MarkdownGenerator:
         prompt = f"""You're a {character_a}. Please create the content of the first paragraph of the article based on the reference content I give you and the task and central theme I assign to you. {instruction_text} If the reference content has no information reference, the theme can be generated in line with the task. \n\n Reference content: \n{knowledge_content}\n\n. No matter what the input language is, you must output text in {language}. \n Output requirements are as follows :\n
         1. Required to demonstrate expertise in the field.
         2. Require rich content and guide the full text.
-        3. The word requirement is about 200 words.
+        3. The word requirement is about 50 words.
         4. output the text in bulletpoints
         Please create the first paragraph based on the task {task_name} and the central topic {main_idea}.
         """
@@ -165,7 +165,7 @@ class MarkdownGenerator:
         instruction_text = f" Additionally, consider the following specific instruction: '{instruction}'." if instruction else ""
         
         prompt = f"""You are a {character_a}. Please create the content of the last paragraph based on the task name, the central theme of the article, the content of the first paragraph, and the main content of the article based on the reference content I gave you, and it is required to echo the first paragraph. {instruction_text} No matter what the input language is, you must output text in {language}.
-        Finish the article based on the task name of "{task_name}", the central theme of "{main_idea}", the article content of "{sub_idea}", and the first paragraph of "{introduction}". The generated ending must correspond with the first paragraph of the article and incorporate any relevant aspects of the provided instruction if applicable. The conclusion should be about 200 words, and the output is in bullet points.
+        Finish the article based on the task name of "{task_name}", the central theme of "{main_idea}", the article content of "{sub_idea}", and the first paragraph of "{introduction}". The generated ending must correspond with the first paragraph of the article and incorporate any relevant aspects of the provided instruction if applicable. The conclusion should be about 50 words, and the output is in bullet points.
         """
         ans = ask_llm(self.session, prompt)
         return ans
@@ -418,7 +418,6 @@ class MarkdownGenerator:
 
         for sub_idea in sub_ideas_list:
             sub_idea_new = ".".join(sub_idea.split(".")[1:])
-            sub_idea_new = str(len(sub_ideas_list_new) + 1) + "." + sub_idea_new
             sub_ideas_list_new.append(sub_idea_new)
 
         # Limit the number of sub-ideas
