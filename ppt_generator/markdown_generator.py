@@ -353,7 +353,7 @@ class MarkdownGenerator:
         save_path,
         task_name: str = "write a summary",
         character_a: str = "you are a professional researcher",
-         instruction: Optional[str] = None  
+        instruction: Optional[str] = None  
     ):
         """
         Generates the final summary for a given task. The summary are divided into parts and saved in the respective md files
@@ -486,7 +486,7 @@ class MarkdownGenerator:
         first step ask llm to parse opinions into three categories : revise/delete/regenrate the content based on the feedback.
         then call the respective function to update the content.
         """
-        
+
 
 if __name__ == "__main__":
     character_a = "You're an experienced technologist"
