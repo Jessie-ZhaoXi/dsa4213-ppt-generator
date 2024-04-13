@@ -121,7 +121,7 @@ async def get_questions(q):
     print('q.client.remote_path', q.client.remote_path)
     min_widths = {table_name: '350px'}
     items = [
-        ui_table_from_df(df, name='questions', sortables=[table_name], link_col=table_name, min_widths=min_widths, height= '250px'),
+        ui_table_from_df(df, name='questions', sortables=[table_name], link_col=table_name, min_widths=min_widths, height= '200px'),
         ui.text(text_heading.format(initial_petition)),
         ui.text(f"""<object data="{q.client.remote_path}" type="application/pdf" width="100%" height="450px"></object>""")
         

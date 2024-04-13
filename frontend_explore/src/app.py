@@ -126,7 +126,7 @@ async def file_upload(q: Q):
                 print(f'******######downloaded:{local_path}')
                 q.client.path = local_path
                 q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
-                q.client.collection_request_id = q.app.h2ogpte.create_collection(f'collection_{path}', f'Collection for {path}')
+                q.client.collection_request_id = q.app.h2ogpte.create_collection(collection_name, collection_description)
                 q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)
                 await q.run(q.app.h2ogpte.ingest_filepath, q.client.path, q.client.collection_request_id)
                 await get_home_items(q, flag="uploaded")
