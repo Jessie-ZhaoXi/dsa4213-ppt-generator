@@ -15,35 +15,6 @@ def ask_llm(session: Session, question: str, llm: str = "gpt-4-1106-preview", ll
     ).content
     return ans
 
-def read_index(index_path):
-        """
-        Read the index file and return the sections
-        """
-        sections = []
-        with open(index_path, 'r', encoding='utf-8') as index_file:
-            for line in index_file:
-                section_type, filename = line.strip().split(',')
-                sections.append((section_type, filename))
-        return sections
-
-def combine_mds(read_path, task_name):
-        index_path = os.path.join(read_path, 'index.txt')
-        md_path = os.path.join(read_path, 'parts/')
-        output_path = os.path.join(read_path, f'{task_name}.md')
-        sections = read_index(index_path)
-
-        combined_content = ""
-        for section in sections:
-            filename = section[1]
-            chunk_path = os.path.join(os.path.dirname(md_path), filename)
-            with open(chunk_path, 'r', encoding='utf-8') as chunk_file:
-                combined_content += chunk_file.read() 
-
-        with open(output_path, 'w', encoding='utf-8') as output_file:
-            output_file.write(combined_content)
-        print(f"Combined document saved to {output_path}")
-        return combined_content
-
 def read_md_file(file_path, encoding="utf-8"):
     """
     Read the content of a markdown file

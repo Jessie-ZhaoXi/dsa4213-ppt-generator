@@ -42,22 +42,26 @@ def main():
     # Generate markdown
     chat_session_id = client.create_chat_session(collection_id)
     with client.connect(chat_session_id) as session:
-        # Generate the summary
+        # Generate the markdown file
         article_md = MarkdownGenerator(session)
         article_md.generate_md_artical(save_path= MD_DIR)
-        md_content = combine_mds(MD_DIR, task_name)
+        md_content = article_md.combine_mds(MD_DIR, task_name, instruction = "i want you to have a sub-idea about the training process, and a subcontent to elaborate the training process")
 
-    # Generate the ppt
+        # Generate the ppt
+        """ 
+        out = parse_str(md_content)
+        for i in range(1, 3):  # generate two modes of ppt
+            PptGenerator(
+                md_content,
+                PPT_MODE_DIR + str(i),
+                save_path=PPT_DIR + task_name + "_mode" + str(i) + ".pptx",
+            )
+        """
 
-    out = parse_str(md_content)
-
-    for i in range(1, 3):  # generate two modes of ppt
-        PptGenerator(
-            md_content,
-            PPT_MODE_DIR + str(i),
-            save_path=PPT_DIR + task_name + "_mode" + str(i) + ".pptx",
-        )
-
+    # Revise ppt
+    #with client.connect(chat_session_id) as session:
+    #    mardown_updater = MarkdownUpdater(session)
 
 if __name__ == "__main__":
+
     main()
