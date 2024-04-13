@@ -96,6 +96,7 @@ class MarkdownGenerator:
         1. Required to demonstrate expertise in the field.
         2. Require rich content and guide the full text.
         3. The word requirement is about 200 words.
+        4. output the text in bulletpoints
         Please create the first paragraph based on the task {task_name} and the central topic {main_idea}.
         """
         ans = ask_llm(self.session, prompt)
@@ -141,7 +142,7 @@ class MarkdownGenerator:
         
         prompt = f"""
         You're a {character_a}. Please, according to the task I have assigned to you, the central theme, generate a whole paragraph of specific content based on this sub-theme as part of the whole article. {instruction_text} \n\n can refer to: \n{knowledge_content}\n\n. No matter what the input language is, you must output text in {language}.
-        Based on the background information of task {task_name} and main topic {main_idea}, output the content of the subtopic {sub_idea} in the subtopic of {task_name}. The content of the subtopic must be 200 characters. The meaning must be fully expressed.
+        Based on the background information of task {task_name} and main topic {main_idea}, output the content of the subtopic {sub_idea} in the subtopic of {task_name}. The content of the subtopic must be 200 characters, and the content is output in bullet points. The meaning must be fully expressed.
         """
         ans = ask_llm(self.session, prompt)
         return ans
@@ -164,7 +165,7 @@ class MarkdownGenerator:
         instruction_text = f" Additionally, consider the following specific instruction: '{instruction}'." if instruction else ""
         
         prompt = f"""You are a {character_a}. Please create the content of the last paragraph based on the task name, the central theme of the article, the content of the first paragraph, and the main content of the article based on the reference content I gave you, and it is required to echo the first paragraph. {instruction_text} No matter what the input language is, you must output text in {language}.
-        Finish the article based on the task name of "{task_name}", the central theme of "{main_idea}", the article content of "{sub_idea}", and the first paragraph of "{introduction}". The generated ending must correspond with the first paragraph of the article and incorporate any relevant aspects of the provided instruction if applicable. The conclusion should be about 200 words.
+        Finish the article based on the task name of "{task_name}", the central theme of "{main_idea}", the article content of "{sub_idea}", and the first paragraph of "{introduction}". The generated ending must correspond with the first paragraph of the article and incorporate any relevant aspects of the provided instruction if applicable. The conclusion should be about 200 words, and the output is in bullet points.
         """
         ans = ask_llm(self.session, prompt)
         return ans
