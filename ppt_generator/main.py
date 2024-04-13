@@ -16,6 +16,7 @@ task_name = "attention"  # place holder
 def main():
     # Connect to the server
     client = H2OGPTE(address=REMOTE_ADDRESS, api_key=API_KEY)
+    
     collection_id = None
     ## Name should be modified according to the file_name
     name = "h2ogpte Python client demo resnet text"

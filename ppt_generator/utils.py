@@ -3,6 +3,7 @@ import random
 import re
 from h2ogpte import Session
 from config import LLM_ARGS
+import json
 
 def ask_llm(session: Session, question: str, llm: str = "gpt-4-1106-preview", llm_args = LLM_ARGS):
     ans = session.query(
@@ -51,3 +52,19 @@ def get_random_file(path):
     random_file = random.choice(files)
     random_file_path = os.path.join(folder_path, random_file)
     return random_file_path
+
+
+def dump_json(data, file_path):
+    '''
+    Save data in json format
+    '''
+    with open(file_path, "w") as json_file:
+        json.dump(data, json_file)
+
+def read_json(file_path):
+    '''
+    Load a json object
+    '''
+    with open(file_path, "r") as json_file:
+        data = json.load(json_file)
+    return data
