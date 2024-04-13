@@ -45,7 +45,7 @@ def main():
     with client.connect(chat_session_id) as session:
         # Generate the markdown file
         article_md = MarkdownGenerator(session)
-        #article_md.generate_md_artical(save_path= MD_DIR, instruction="I want you to have a sub-idea about the training process, and a subcontent to elaborate the training process")
+        article_md.generate_md_artical(save_path= MD_DIR, instruction="I want you to have a sub-idea about the training process, and a subcontent to elaborate the training process")
         md_content = article_md.combine_mds(MD_DIR, task_name)
 
         # Generate the ppt
