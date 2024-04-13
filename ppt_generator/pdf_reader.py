@@ -3,6 +3,8 @@ import pathlib
 #from spire.pdf import *
 import re
 from h2ogpte import H2OGPTE
+from utils import *
+from config import *
 
 
 def ingest_documents(
@@ -17,8 +19,13 @@ def ingest_documents(
     """
     # Upload file into collection
     #pdf_reader = PDF_Reader()
-    #text_output_path, image_output_folder = '', ''
-    #pdf_reader.extract_text_and_image(text_output_path, image_output_folder)
+    #pdf_reader.load_pdf(pdf_path)
+    #text_path, image_output_folder = 'data/attention.txt', 'data'
+    #pdf_reader.extract_text_and_image(text_path, image_output_folder, client)
+    json_path = 'data/image_title_description_mapping.json'
+    #dump_json(pdf_reader.dic, json_path)
+
+
     text_path = 'data/attention.txt'
 
 
@@ -46,7 +53,7 @@ class PDF_Reader:
   def load_pdf(self, path):
     self.doc.LoadFromFile(path)
 
-  def extract_text_and_image(self, text_output_path, image_output_folder):
+  def extract_text_and_image(self, text_output_path, image_output_folder, client):
     extractedText = open(text_output_path, "w", encoding="utf-8")
     if self.doc.Pages.Count == 0:
       print('Please Check Whether You Have Loaded a PDF Correctly.')
@@ -65,7 +72,7 @@ class PDF_Reader:
         figure_number = matches.group(1)
         figure_description = matches.group(2).replace("\n", "").replace("\r", "")
       
-        descriptions = self.parse_description(figure_description, len(images))
+        descriptions = self.parse_description(figure_description, len(images), client)
         if len(images) != len(descriptions):
           images = images[:len(descriptions)]
         for i in range(len(images)):
@@ -77,9 +84,26 @@ class PDF_Reader:
     extractedText.close()
     self.dic = dic
   
-  def parse_description(self, description, num_images):
+  def parse_description(self, description, num_images, client):
     if num_images > 1:
       ## Use LLM to handle. TODO
-      return ['Scaled Dot-Product Attention.', 'Multi-Head Attention consists of several                            attention layers running in parallel.']
+      llm = "h2oai/h2ogpt-4096-llama2-13b-chat"
+
+      question = '''
+      Suppose now I am extracting the title or description of some images in PDF, the text may include more than one image titles. Can you help me split it? Please just return the result.
+      Description: {}'''
+
+      answer = client.answer_question(llm_args = LLM_ARGS,question= question.format(description), llm=llm).content
+      
+      pattern = r'\d+\.\s*"([^"]+)'
+
+      # Find all matches in the text
+      matches = re.findall(pattern, answer)
+      output = []
+      # Print the figure names
+      for match in matches:
+          output.append(match)
+
+      return output
     else:
       return [description]
