@@ -121,7 +121,7 @@ def get_sidebar(q):
         # ui.button(name='submit_demo', label=sidebar_text['label'], primary=True, icon='Upload'),
         ui.file_upload(
             name='file_upload', 
-            label='Upload your documents', 
+            label='Upload your document', 
             file_extensions=['pdf'],
             multiple=True),
         ui.separator(),

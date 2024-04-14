@@ -1,5 +1,5 @@
 texts_app_ptbr = {
-    'title':'PPT Generator - Make Slides in one click',
+    'title':'PPT Generator - Make presentations in minutes',
     'subtitle': 'DSA4213 Project, Made by Team Supersonic Rocket, with love',
     'first_rows':[
                 ["Create PPT Slides In One Click", False],
@@ -16,7 +16,7 @@ texts_app_ptbr = {
             'Generate a summary for the second paragragh',
         ]},
     'table_name':'PPT Generater',
-    'table_header':'Create a PPT in one click',
+    'table_header':'Create a PPT in minutes',
     'table_subtitle':'PPT Generater',
     'initial_petition':'Temp View',
     'dialog':{
@@ -32,7 +32,7 @@ texts_app_ptbr = {
 
 
 texts_app_en = {
-    'title':'PPT Generator - Make Slides in one click',
+    'title':'PPT Generator - Make presentations in minutes',
     'subtitle': 'DSA4213 Project, Made by Team Supersonic Rocket, with love',
     'first_rows':[
                 ["Create PPT Slides In One Click", False],
@@ -49,7 +49,7 @@ texts_app_en = {
             'Generate a summary for the second paragragh',
         ]},
     'table_name':'PPT Generater',
-    'table_header':'Create a PPT in one click',
+    'table_header':'Create a PPT in minutes',
     'table_subtitle':'PPT Generater',
     'initial_petition':'Temp View',
     'dialog':{
