@@ -4,6 +4,7 @@ import re
 from h2ogpte import Session
 from ppt_generator.config import LLM_ARGS
 import json
+import Levenshtein
 
 def ask_llm(session: Session, question: str, llm: str = "gpt-4-1106-preview", llm_args = LLM_ARGS):
     ans = session.query(
@@ -73,13 +74,10 @@ def extract_text_using_regex(text, pattern):
     matches = re.findall(pattern, text)
     return matches
 
-def generate_ppt_image_mapping(dic_path, md_path, client):
-    with open(md_path, 'r') as file:
-        # Read the contents of the file as a string
-        md_content = file.read()
+def generate_ppt_image_mapping(dic_path, md_content, client):
     
     question = '''
-                You will be given a markdown file and a description of an image. Can you tell me which section shall I insert the image based on the text description? Please return the section name only and do not return any other text including the explanation.
+                You will receive a markdown file along with a description of an image. Your task is to determine the appropriate section within the markdown file to insert the image, based on the text description and the content of each section. Please provide the name of the section starting with '##', without including any additional text or explanation.
                 Markdown file: {}
                 Image description: {}
             '''
@@ -91,9 +89,15 @@ def generate_ppt_image_mapping(dic_path, md_path, client):
 
     for key, value in ori_dic.items():
         answer = client.answer_question(llm_args = LLM_ARGS,question= question.format(md_content, value), llm=llm).content
-        section_name = extract_text_using_regex(answer, pattern)[0]
-        dic[key] = section_name
+        matches = extract_text_using_regex(answer, pattern)
+        if matches:
+            section_name = matches[0]
+            dic[key] = section_name
     dump_json(dic, 'test.json')
     return dic
+
+def calculate_edit_distance(s1, s2):
+  s1, s2 = s1.strip().lower(), s2.strip().lower()
+  return Levenshtein.distance(s1, s2)
     
 

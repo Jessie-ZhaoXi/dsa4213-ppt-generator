@@ -53,3 +53,4 @@ xlsxwriter==3.2.0 ; python_version >= "3.8" and python_version < "4.0"
 zipp==3.18.1 ; python_version >= "3.8" and python_version < "3.10"
 tqdm
 toml
+Levenshtein
