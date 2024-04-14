@@ -39,7 +39,7 @@ class PptGenerator:
     theme: str = None
 
     def __init__(
-        self,client, md_str: str, theme_path: str, save_path: str = PPT_DIR + "test.pptx"
+        self,client, img_dic, md_str: str, theme_path: str, save_path: str = PPT_DIR + "test.pptx"
     ) -> None:
         self.theme = theme_path
         theme_param_path = os.path.join(self.theme, "mode.json")
@@ -52,32 +52,11 @@ class PptGenerator:
         # generate the title page
         MD2TitleSlide(self.prs, self.theme, self.ppt_main_theme)
         # prepare the image for the main page
-        self.init_img_dic(IMG_DESCRIPTION_DIC_PATH,md_str, client)
+        self.img_dic = img_dic
         # generate the slides
         self.traverse_tree(self.tree)
         self.prs.save(save_path)
 
-    def init_img_dic(self, dic_path, md_content, client):
-        question = '''
-                You will receive a markdown file along with a description of an image. Your task is to determine the appropriate section within the markdown file to insert the image, based on the text description and the content of each section. Please provide the name of the section starting with '##', without including any additional text or explanation.
-                Markdown file: {}
-                Image description: {}
-            '''
-    
-        #llm = "h2oai/h2ogpt-4096-llama2-70b-chat"
-        llm = "gpt-4-1106-preview"
-        ori_dic = read_json(dic_path)
-        dic = {}
-        pattern = r'##\s*(.*?)(?:\n|$)'
-
-        for key, value in ori_dic.items():
-            answer = client.answer_question(llm_args = LLM_ARGS,question= question.format(md_content, value), llm=llm).content
-            matches = extract_text_using_regex(answer, pattern)
-            if matches:
-              section_name = matches[0]
-              dic[key] = section_name
-        dump_json(dic, 'test.json')
-        self.img_dic = dic
 
     def init_pptx(self, theme_path: str = PPT_MODE_DIR + "1") -> None:
         """

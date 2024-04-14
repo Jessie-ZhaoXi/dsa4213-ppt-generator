@@ -46,11 +46,12 @@ def oneshot_generate_ppt(client: H2OGPTE, session:Session, task_name: str) -> Ma
         save_path=MD_DIR, instruction="generate 5 sub-ideas only"
     )
     md_content = article_md.combine_mds(MD_DIR, task_name)
-
+    image_mapping_dic = generate_ppt_image_mapping(IMG_DESCRIPTION_DIC_PATH, md_content, client)
     # Generate the ppt
     for i in range(1, 3):  # generate two modes of ppt
         PptGenerator(
             client,
+            image_mapping_dic,
             md_content,
             PPT_MODE_DIR + str(i),
             save_path=PPT_DIR + task_name + "_mode" + str(i) + ".pptx",
@@ -71,10 +72,11 @@ def main():
         output_mag = article_md.update_md(path = MD_DIR, opinion= "haha just joking i'm testing")
         print(f"Updated markdown file: {output_mag}")
         md_content = article_md.combine_mds(MD_DIR, task_name)
-
+        image_mapping_dic = generate_ppt_image_mapping(IMG_DESCRIPTION_DIC_PATH, md_content, client)
         for i in range(2, 3):  # generate two modes of ppt
             PptGenerator(
                 client,
+                image_mapping_dic,
                 md_content,
                 PPT_MODE_DIR + str(i),
                 save_path=PPT_DIR + task_name + "_mode" + str(i) + ".pptx",

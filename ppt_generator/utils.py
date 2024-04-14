@@ -82,7 +82,7 @@ def generate_ppt_image_mapping(dic_path, md_content, client):
                 Image description: {}
             '''
     
-    llm = "h2oai/h2ogpt-4096-llama2-70b-chat"
+    llm = "gpt-4-1106-preview"
     ori_dic = read_json(dic_path)
     dic = {}
     pattern = r'##\s*(.*?)(?:\n|$)'
