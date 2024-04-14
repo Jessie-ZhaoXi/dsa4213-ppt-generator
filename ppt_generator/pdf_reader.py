@@ -22,7 +22,7 @@ def ingest_documents(
     #pdf_reader.load_pdf(pdf_path)
     #text_path, image_output_folder = 'data/attention.txt', 'data'
     #pdf_reader.extract_text_and_image(text_path, image_output_folder, client)
-    json_path = 'data/image_title_description_mapping.json'
+    json_path = IMG_DESCRIPTION_DIC_PATH
     #dump_json(pdf_reader.dic, json_path)
 
 

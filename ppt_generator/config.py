@@ -9,12 +9,13 @@ REMOTE_ADDRESS: str
 """
 
 from pydantic_settings import BaseSettings
+
 MD_DIR = "./my_mds/"
 PDF_PATH = "./data/attention.pdf"
 PPT_DIR = "./my_ppts/"
 PPT_MODE_DIR = "./ppt_mode/"
 LLM_ARGS = dict(temperature=0, do_sample=False, top_k=1, seed=4213)
-
+IMG_DESCRIPTION_DIC_PATH = 'data/image_title_description_mapping.json'
 
 class Settings(BaseSettings):
     H2OGPTE_API_TOKEN: str = ""

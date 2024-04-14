@@ -55,6 +55,7 @@ def main():
         out = parse_str(md_content)
         for i in range(1, 3):  # generate two modes of ppt
             PptGenerator(
+                client,
                 md_content,
                 PPT_MODE_DIR + str(i),
                 save_path=PPT_DIR + task_name + "_mode" + str(i) + ".pptx",
@@ -67,6 +68,7 @@ def main():
 
         for i in range(2, 3):  # generate two modes of ppt
             PptGenerator(
+                client,
                 md_content,
                 PPT_MODE_DIR + str(i),
                 save_path=PPT_DIR + task_name + "_mode" + str(i) + ".pptx",
