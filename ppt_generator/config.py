@@ -10,7 +10,7 @@ REMOTE_ADDRESS: str
 
 from pydantic_settings import BaseSettings
 
-API_KEY = ""
+API_KEY = "sk-79ZrY3vtuYD1kJXcvHNLgwRpmCQy8Jj7zwpfHYauyjLslDtv"
 REMOTE_ADDRESS = "https://h2ogpte.genai.h2o.ai"
 MD_DIR = "./my_mds/"
 PDF_PATH = "./data/attention.pdf"

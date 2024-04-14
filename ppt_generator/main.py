@@ -44,7 +44,7 @@ def main():
     with client.connect(chat_session_id) as session:
         # Generate the markdown file
         article_md = MarkdownGenerator(session)
-        article_md.generate_md_artical(save_path= MD_DIR, instruction="generate two sub-ideas only")
+        article_md.generate_md_artical(save_path= MD_DIR, instruction="dedicate a sub-idea about regularization only")
         md_content = article_md.combine_mds(MD_DIR, task_name)
 
         # Generate the ppt
