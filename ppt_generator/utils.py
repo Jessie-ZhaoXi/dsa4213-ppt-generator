@@ -2,7 +2,7 @@ import os
 import random
 import re
 from h2ogpte import Session
-from config import LLM_ARGS
+from ppt_generator.config import LLM_ARGS
 import json
 import Levenshtein
 

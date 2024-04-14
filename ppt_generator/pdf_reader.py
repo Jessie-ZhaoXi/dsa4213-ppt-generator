@@ -3,8 +3,8 @@ import pathlib
 #from spire.pdf import *
 import re
 from h2ogpte import H2OGPTE
-from utils import *
-from config import *
+from ppt_generator.utils import *
+from ppt_generator.config import *
 
 
 def ingest_documents(
