@@ -2,7 +2,7 @@ import os
 import random
 import re
 from h2ogpte import Session
-from config import LLM_ARGS
+from ppt_generator.config import LLM_ARGS
 import json
 
 def ask_llm(session: Session, question: str, llm: str = "gpt-4-1106-preview", llm_args = LLM_ARGS):

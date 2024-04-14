@@ -1,9 +1,8 @@
 from typing import Optional
 
 from h2ogpte import Session
-from utils import get_sublist, save_md
-from config import LLM_ARGS
-from utils import *
+from ppt_generator.config import LLM_ARGS
+from ppt_generator.utils import *
 import os
 
 
@@ -373,12 +372,12 @@ class MarkdownGenerator:
 
         # Get the article summary
         article_summary = self.main_idea_knowledge
-
+        print("article_summary is \n", article_summary)
         # Get the main idea
         main_idea = self._get_main_idea(
             task_name, character_a, knowledge_content=article_summary, instruction=instruction
         )
-
+        print("main_idea is \n", main_idea)
         # Get the title name
         title_name = self._get_title_name(main_idea, instruction=instruction)
         title_name =  "# " + title_name + "\n"

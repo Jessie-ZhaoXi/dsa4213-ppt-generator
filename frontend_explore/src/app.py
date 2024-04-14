@@ -3,7 +3,7 @@ import os
 import logging
 from pathlib import Path
 import requests
-from src.texts_app import texts_app_ptbr, texts_app_en
+from src.texts_app import texts_app_en
 from ppt_generator.config import H2OGPTE_SETTINGS
 from src.doc_qna_h2ogpte import QnAManager, H2OGPTEClient
 from src.utils import loading
