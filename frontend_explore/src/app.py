@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 import requests
 from src.texts_app import texts_app_ptbr, texts_app_en
-print(texts_app_en)
+from ppt_generator.config import H2OGPTE_SETTINGS
 from src.doc_qna_h2ogpte import QnAManager, H2OGPTEClient
 from src.utils import loading
 from src.constants import *
@@ -36,10 +36,10 @@ async def serve(q: Q):
     await run_on(q)
 
 
-async def initialize_app(q):
+async def initialize_app(q): 
     q.app.h2ogpte_keys = {
-                "address": os.getenv("H2OGPTE_URL"),
-                "api_key": os.getenv("H2OGPTE_API_TOKEN"),
+                "address": H2OGPTE_SETTINGS.H2OGPTE_URL,
+                "api_key": H2OGPTE_SETTINGS.H2OGPTE_API_TOKEN,
             }
     q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
     q.app.collection_id = q.app.h2ogpte.create_collection(collection_name, collection_description)
