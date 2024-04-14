@@ -5,6 +5,7 @@ import os, glob
 import asyncio
 import datetime
 import json
+from ppt_generator.main import oneshot_generate_ppt
 
 logging.basicConfig(level=logging.INFO)
 
@@ -107,18 +108,11 @@ class H2OGPTEClient:
             logging.info(f'File {filename} ingested')
         else:
             logging.info(f'File {filename} already ingested')
+        # Add one-shot generate ppt
+        # chat_session_id = self.client.create_chat_session(collection_id)
+        # with self.client.connect(chat_session_id) as session:
+        #     oneshot_generate_ppt(session, filepath, filename)
         return
-    
-    # def ingest_url(self, url, collection_id):
-    #     filename = url.split("/")[-1]
-    #     documents = self.client.list_documents_in_collection(collection_id, 0, 1000)
-    #     document_ids = [d.id for d in documents if d.name == filename]
-    #     if len(document_ids) == 0:
-    #         self.client.ingest_website(collection_id, url)
-    #         logging.info(f'File {filename} ingested')
-    #     else:
-    #         logging.info(f'File {filename} already ingested')
-    #     return
     
     def _get_collection_chunks(self, collection_id):
         chunk_sizes = 80
@@ -157,12 +151,12 @@ class H2OGPTEClient:
 
 class QnAManager:
     def __init__(self, client, llm, collection_request_id, collection_stf_id, language):
-        from .prompts import prompts_pt, prompts_eng
+        from .prompts import prompts_eng
         self.client = client.client
         self.llm = llm
         self.collection_request_id = collection_request_id
         self.collection_stf_id = collection_stf_id
-        self.prompts = prompts_pt if language == 'ptbr' else prompts_eng
+        self.prompts = prompts_eng
         self.language = language
         self.json_file_path = "./history.json"
     
@@ -272,8 +266,7 @@ class QnAManager:
             return response
 
     async def answer_question(self, q, question_prompt, filename):
-        from .prompts import sum_check, stf_temas_check
-        stf_temas_check_func = lambda x: any([i in x.lower() for i in stf_temas_check])
+        from .prompts import sum_check
         sum_check_func = lambda x: any([i in x.lower() for i in sum_check])
         summary_task, delete_old, open_ques = False, False, False
         if question_prompt.lower()[-5:]=="--new":
@@ -287,7 +280,8 @@ class QnAManager:
         cfg['filename'] = str(filename)
         cfg['language'] = self.language
         cfg['created'] = str(datetime.datetime.now())
-        if sum_check_func(question_prompt) and not stf_temas_check_func(question_prompt):
+        if sum_check_func(question_prompt):
+            # if the question is a summary task
             q.page['card_1'].data += ["<img src='{}' height='40px'/>".format(q.app.loader), False]
             await q.page.save()
             check_exist, res = self._check_history(filename, delete_old)
@@ -298,17 +292,9 @@ class QnAManager:
             cfg['summary'] = res.replace('"', "'")
             q.page['card_1'].data[-1] = [res, False]
             await q.page.save()
-        elif stf_temas_check_func(question_prompt):
-            check_exist, summary = self._check_history(filename, delete_old)
-            if check_exist==False:
-                summary = self._get_full_summary(self.collection_request_id)
-                if not summary.startswith('Not able to construct an answer at the moment.'):
-                    summary_task = True
-            question_prompt = self.prompts['stf_tema_prompt'].format(summary)
-            res = await self._chat(q, question_prompt, open_question=open_ques, stf_check=True)
-            cfg['summary'] = summary.replace('"', "'")
         else:
-            question_prompt = self.prompts['peticao_prompt'].format(question_prompt)
+            # if the question is a regular question
+            question_prompt = self.prompts['ppt_prompt'].format(question_prompt)
             res = await self._chat(q, question_prompt, open_question=open_ques, stf_check=False)
 
         if summary_task:
