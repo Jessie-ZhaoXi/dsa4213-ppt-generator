@@ -45,15 +45,27 @@ def main():
     with client.connect(chat_session_id) as session:
         # Generate the markdown file
         article_md = MarkdownGenerator(session)
-        article_md.generate_md_artical(
-            save_path=MD_DIR, instruction="generate two sub-ideas only"
-        )
+        #article_md.generate_md_artical(
+        #    save_path=MD_DIR, instruction="generate 5 sub-ideas only"
+        #)
         md_content = article_md.combine_mds(MD_DIR, task_name)
 
         # Generate the ppt
 
         out = parse_str(md_content)
         for i in range(1, 3):  # generate two modes of ppt
+            PptGenerator(
+                md_content,
+                PPT_MODE_DIR + str(i),
+                save_path=PPT_DIR + task_name + "_mode" + str(i) + ".pptx",
+            )
+
+        # update the marlkdown file
+        output_mag = article_md.update_md(path = MD_DIR, opinion= "haha just joking i'm testing")
+        print(f"Updated markdown file: {output_mag}")
+        md_content = article_md.combine_mds(MD_DIR, task_name)
+
+        for i in range(2, 3):  # generate two modes of ppt
             PptGenerator(
                 md_content,
                 PPT_MODE_DIR + str(i),

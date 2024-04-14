@@ -95,7 +95,7 @@ class MarkdownGenerator:
         prompt = f"""You're a {character_a}. Please create the content of the first paragraph of the article based on the reference content I give you and the task and central theme I assign to you. {instruction_text} If the reference content has no information reference, the theme can be generated in line with the task. \n\n Reference content: \n{knowledge_content}\n\n. No matter what the input language is, you must output text in {language}. \n Output requirements are as follows :\n
         1. Required to demonstrate expertise in the field.
         2. Require rich content and guide the full text.
-        3. The word requirement is about 50 words.
+        3. The word requirement is about 30 words.
         4. output the text in bulletpoints
         Please create the first paragraph based on the task {task_name} and the central topic {main_idea}.
         """
@@ -482,10 +482,43 @@ class MarkdownGenerator:
         
     def update_md(self, path, opinion):
         """
-        Update the markdown content.
-        first step ask llm to parse opinions into three categories : revise/delete/regenrate the content based on the feedback.
-        then call the respective function to update the content.
+        Update the markdown content based on the provided opinion.
+        Ask the LLM to categorize the opinion and return the category along with any relevant details in a structured format.
+        If the action involves 'revise' or 'delete', include the page number; otherwise, return an empty string for the detail.
         """
+        prompt = f"""
+        Analyze the following user input: '{opinion}'. Categorize the input  into 'revise', 'delete', 'regenerate', or 'other'.
+        'revise' means revise the certain page based on the opinion.
+        'delete' means delete the certain page based on the opinion.
+        'regenerate' means regenerate the whole markdown file based on the opinion.
+        'other' means other operations that do not fall into the above categories.
+        Return the response in the following format:
+        - If the category is 'revise' or 'delete', format should be: ['category', 'page number'], here 'page number' refers to the page number to be revised or deleted.
+        - For all other categories, format should be: ['category', '']
+        """
+
+        # Example call to LLM with the session and prompt
+        response = ask_llm(self.session, prompt)
+        # Assuming response format is a string that needs parsing
+        response_elements = response.strip("[]").replace("'", "").split(',')
+        category = response_elements[0].strip().lower()
+
+        if category in ['revise', 'delete'] and len(response_elements) > 1:
+            page_number = int(response_elements[1].strip())
+            if category == 'revise':
+                self._revise_md(page_number, opinion, path)
+                return f"revised page {page_number}"
+            elif category == 'delete':
+                self._delete_md(page_number, path)
+                return f"deleted page {page_number}"
+        else:
+            if category == 'regenerate':
+                self.generate_md_artical(path, instruction=opinion)
+                return "Regenerating the slides"
+            else:
+                return "Please give a more specific instruction"
+
+
 
 
 if __name__ == "__main__":
