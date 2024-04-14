@@ -98,12 +98,6 @@ class PDF_Reader:
       pattern = r'\d+\.\s*(.*?)(?:\n|$)'
 
       # Find all matches in the text
-      matches = re.findall(pattern, answer)
-      output = []
-      # Print the figure names
-      for match in matches:
-          output.append(match)
-
-      return output
+      return extract_text_using_regex(answer, pattern)
     else:
       return [description]
