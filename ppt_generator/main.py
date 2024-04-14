@@ -16,7 +16,11 @@ task_name = "attention"  # place holder
 def main():
     # Connect to the server
     client = H2OGPTE(address=REMOTE_ADDRESS, api_key=API_KEY)
+    dic_path = 'data/image_title_description_mapping.json'
+    md_path = 'my_mds/attention.md'
+    generate_ppt_image_mapping(dic_path, md_path, client)
     
+    return
     collection_id = None
     ## Name should be modified according to the file_name
     name = "h2ogpte Python client demo resnet text"

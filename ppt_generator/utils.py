@@ -68,3 +68,32 @@ def read_json(file_path):
     with open(file_path, "r") as json_file:
         data = json.load(json_file)
     return data
+
+def extract_text_using_regex(text, pattern):
+    matches = re.findall(pattern, text)
+    return matches
+
+def generate_ppt_image_mapping(dic_path, md_path, client):
+    with open(md_path, 'r') as file:
+        # Read the contents of the file as a string
+        md_content = file.read()
+    
+    question = '''
+                You will be given a markdown file and a description of an image. Can you tell me which section shall I insert the image based on the text description? Please return the section name only and do not return any other text including the explanation.
+                Markdown file: {}
+                Image description: {}
+            '''
+    
+    llm = "h2oai/h2ogpt-4096-llama2-70b-chat"
+    ori_dic = read_json(dic_path)
+    dic = {}
+    pattern = r'##\s*(.*?)(?:\n|$)'
+
+    for key, value in ori_dic.items():
+        answer = client.answer_question(llm_args = LLM_ARGS,question= question.format(md_content, value), llm=llm).content
+        section_name = extract_text_using_regex(answer, pattern)[0]
+        dic[key] = section_name
+    dump_json(dic, 'test.json')
+    return dic
+    
+
