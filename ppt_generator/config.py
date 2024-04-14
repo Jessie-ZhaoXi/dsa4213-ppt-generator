@@ -10,29 +10,20 @@ REMOTE_ADDRESS: str
 
 from pydantic_settings import BaseSettings
 
-API_KEY = ""
-REMOTE_ADDRESS = "https://h2ogpte.genai.h2o.ai"
 MD_DIR = "./my_mds/"
 PDF_PATH = "./data/attention.pdf"
 PPT_DIR = "./my_ppts/"
 PPT_MODE_DIR = "./ppt_mode/"
-LLM_ARGS = dict(
-              temperature=0,
-              do_sample = False,
-              top_k = 1,
-              seed = 4213)
+LLM_ARGS = dict(temperature=0, do_sample=False, top_k=1, seed=4213)
 
 
-# class Settings(BaseSettings):
-#     APP_NAME: str = "AppName"
-#     SQLALCHEMY_URL: str
-#     ENVIRONMENT: str
+class Settings(BaseSettings):
+    H2OGPTE_API_TOKEN: str = ""
+    H2OGPTE_URL: str = "https://h2ogpte.genai.h2o.ai"
+    COLLECTION_NAME: str = "supersonic_rocket_ppt_generator"
 
-#     class Config:
-#         env_file = ".env"  # Works with uvicorn run command from my-app/project/
-#         # env_file = "../.env"  Works with alembic command from my-app/alembic
-#         # env_file = abs_path_env
+    class Config:
+        env_file = ".env"  # The file to read environment variables from
 
 
-# def get_settings():
-#     return Settings()
+H2OGPTE_SETTINGS = Settings()
