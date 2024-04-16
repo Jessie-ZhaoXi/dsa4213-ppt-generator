@@ -5,6 +5,7 @@ from ppt_generator.markdown_generator import MarkdownGenerator
 from ppt_generator.pdf_reader import ingest_documents
 from ppt_generator.utils import *
 from ppt_generator.md2ppt import PptGenerator
+from typing import Optional
 
 """
 This script demonstrates how to use the h2ogpte Python client to generate a PowerPoint presentation from a PDF file.
@@ -33,7 +34,7 @@ def create_client_and_collection()-> Tuple[H2OGPTE, str]:
         print(f"New collection: {collection_id} ...")
     return client, collection_id
 
-def oneshot_generate_ppt(client: H2OGPTE, session:Session, task_name: str) -> MarkdownGenerator:
+def oneshot_generate_ppt(client: H2OGPTE, session:Session, task_name: str, instruction: Optional[str] = None) -> MarkdownGenerator:
     """
     This function will be integrated with the frontend to generate a markdown file and a PowerPoint presentation from a PDF file.
     Generate a markdown file and a PowerPoint presentation from a PDF file.
@@ -43,7 +44,7 @@ def oneshot_generate_ppt(client: H2OGPTE, session:Session, task_name: str) -> Ma
     article_md = MarkdownGenerator(session)
     print("create markdown generator")
     article_md.generate_md_artical(
-        save_path=MD_DIR, instruction="generate 5 sub-ideas only"
+        save_path=MD_DIR, instruction=instruction
     )
     md_content = article_md.combine_mds(MD_DIR, task_name)
     image_mapping_dic = generate_ppt_image_mapping(IMG_DESCRIPTION_DIC_PATH, md_content, client)
