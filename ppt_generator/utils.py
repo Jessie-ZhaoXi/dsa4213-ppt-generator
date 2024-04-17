@@ -99,5 +99,14 @@ def generate_ppt_image_mapping(dic_path, md_content, client):
 def calculate_edit_distance(s1, s2):
   s1, s2 = s1.strip().lower(), s2.strip().lower()
   return Levenshtein.distance(s1, s2)
+
+def read_image_description(json_path = "./data/image_title_description_mapping.json"):
+    """
+    read the json file as a dictionary, and only return the value as a list
+    """
+    with open(json_path, "r") as f:
+        dic = json.load(f)
+    return list(dic.values())
+
     
 

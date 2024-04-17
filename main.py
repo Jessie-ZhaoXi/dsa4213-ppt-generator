@@ -34,14 +34,15 @@ def create_client_and_collection()-> Tuple[H2OGPTE, str]:
         print(f"New collection: {collection_id} ...")
     return client, collection_id
 
-def oneshot_generate_ppt(client: H2OGPTE, session:Session, task_name: str, instruction: Optional[str] = None) -> MarkdownGenerator:
+def oneshot_generate_ppt(client: H2OGPTE, session:Session, task_name: str, min_sub_idea_num: int = 2,
+                         max_sub_idea_num: int = 6, instruction: Optional[str] = None) -> MarkdownGenerator:
     """
     This function will be integrated with the frontend to generate a markdown file and a PowerPoint presentation from a PDF file.
     Generate a markdown file and a PowerPoint presentation from a PDF file.
     """
     # Generate the markdown file
     print("Generating markdown file ...")
-    article_md = MarkdownGenerator(session)
+    article_md = MarkdownGenerator(session, min_sub_idea_num = min_sub_idea_num, max_sub_idea_num = max_sub_idea_num)
     print("create markdown generator")
     article_md.generate_md_artical(
         save_path=MD_DIR, instruction=instruction
@@ -67,7 +68,11 @@ def main():
     chat_session_id = client.create_chat_session(collection_id)
     print(f"Chat session ID: {chat_session_id}")
     with client.connect(chat_session_id) as session:
-        article_md=oneshot_generate_ppt(client, session, task_name)
+        image_list = read_image_description()
+        min_sub_idea_num = len(image_list) + 1
+        max_sub_idea_num = min_sub_idea_num + 2
+        instruction = f"please generate at least {min_sub_idea_num} number of sub-ideas to include idea in {image_list}, with each one as a individual sub-idea" if image_list else ""
+        article_md=oneshot_generate_ppt(client, session, task_name, min_sub_idea_num, max_sub_idea_num, instruction=instruction)
         # update the marlkdown file
         """ 
         output_mag = article_md.update_md(path = MD_DIR, opinion= "haha just joking i'm testing")
