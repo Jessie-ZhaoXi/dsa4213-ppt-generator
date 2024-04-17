@@ -4,7 +4,7 @@ from io import BytesIO
 
 import markdown
 import requests as req
-from config import PPT_DIR, PPT_MODE_DIR, IMG_DESCRIPTION_DIC_PATH, LLM_ARGS
+from ppt_generator.config import PPT_DIR, PPT_MODE_DIR, IMG_DESCRIPTION_DIC_PATH, LLM_ARGS
 from PIL import Image
 from PIL.ImageQt import rgb
 from pptx import Presentation
@@ -13,10 +13,10 @@ from pptx.enum.text import MSO_AUTO_SIZE, MSO_VERTICAL_ANCHOR
 from pptx.slide import Slide
 from pptx.text.text import Font
 from pptx.util import Cm, Inches, Pt
-from utils import read_json, extract_text_using_regex,get_random_file, dump_json, calculate_edit_distance
+from ppt_generator.utils import read_json, extract_text_using_regex,get_random_file, dump_json, calculate_edit_distance
 
 #from ppt_generator.content_generator.img_search import get_img
-from markdown_parser import Heading, Out, parse_str
+from ppt_generator.markdown_parser import Heading, Out, parse_str
 
 """
 This module contains the PptGenerator class, which is used to convert a markdown string into a PowerPoint presentation.
