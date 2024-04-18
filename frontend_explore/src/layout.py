@@ -4,7 +4,6 @@ import os
 import glob
 import hashlib
 from .utils import get_body, get_questions
-from .constants import COMPANY, COMPANY_LOGO, APP_TITLE, THEME, BACKGROUND_IMAGE
 
 text_heading = "<font size=4><b>{}</b></font>"
 themes = [ui.theme(
@@ -55,7 +54,6 @@ def get_header_card(q, items):
     items = items + [ui.menu(
             icon='Globe',
             items=[
-                ui.command(name='portuguese', label='Portuguese 🇧🇷'),
                 ui.command(name='english', label='English 🇺🇸'),
             ])]
     return ui.header_card(

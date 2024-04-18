@@ -1,3 +1,4 @@
+#<<<<<<< HEAD
 texts_app_ptbr = {
     'title':'PPT Generator - Make presentations in minutes',
     'subtitle': 'DSA4213 Project, Made by Team Supersonic Rocket, with love',
@@ -31,6 +32,8 @@ texts_app_ptbr = {
 }
 
 
+#=======
+#>>>>>>> f0c2b6d3addd790ad5901ecaec906e7c07aa7687
 texts_app_en = {
     'title':'PPT Generator - Make presentations in minutes',
     'subtitle': 'DSA4213 Project, Made by Team Supersonic Rocket, with love',

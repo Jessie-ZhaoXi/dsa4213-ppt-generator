@@ -1,9 +1,8 @@
 from typing import Optional
 
 from h2ogpte import Session
-from utils import get_sublist, save_md
-from config import LLM_ARGS
-from utils import *
+from ppt_generator.config import LLM_ARGS
+from ppt_generator.utils import *
 import os
 
 
@@ -65,15 +64,16 @@ class MarkdownGenerator:
         Generates a title for an article based on a given main idea and potentially an additional user instruction.
         """
         
-        # Include the instruction in the prompt if provided
-        instruction_text = f" Consider this additional guidance: '{instruction}'." if instruction else ""
+        # Correctly format the inclusion of the instruction in the prompt
+        instruction_text = f"If relevant, consider the following user instruction: '{instruction}'. Otherwise, ignore it." if instruction else "There is no specific user instruction."
         
-        prompt = f"""You are a "title generator" and you can generate titles based on specific central topics. No matter what the input language is, you must output text in {language}.
-        There is a central theme "{main_idea}".{instruction_text} Please refine the corresponding title based on the central theme and the guidance provided, and ensure the response is no more than 15 words. Don't add anything else.
+        prompt = f"""You are a "title generator" trained to create succinct and relevant titles based on specific central themes. No matter what the input language is, you must output text in {language}.
+        There is a central theme: "{main_idea}".{instruction_text} Based on the central theme and the guidance provided, please refine the corresponding title and ensure the response does not exceed 15 words. Ensure clarity and relevance.
         """
         
         ans = ask_llm(self.session, prompt)
         return ans
+
 
 
     def _get_introduction(
@@ -89,18 +89,25 @@ class MarkdownGenerator:
         Generate the content of the first paragraph of the article based on the given task name, main idea,
         character, knowledge content, language, and an optional user instruction.
         """
-        # If there is an additional instruction, include it in the prompt
-        instruction_text = f" Additionally, consider the following instruction: '{instruction}'." if instruction else ""
-        
-        prompt = f"""You're a {character_a}. Please create the content of the first paragraph of the article based on the reference content I give you and the task and central theme I assign to you. {instruction_text} If the reference content has no information reference, the theme can be generated in line with the task. \n\n Reference content: \n{knowledge_content}\n\n. No matter what the input language is, you must output text in {language}. \n Output requirements are as follows :\n
-        1. Required to demonstrate expertise in the field.
-        2. Require rich content and guide the full text.
-        3. The word requirement is about 50 words.
-        4. output the text in bulletpoints
-        Please create the first paragraph based on the task {task_name} and the central topic {main_idea}.
+        # Enhance the instruction text to be clearer and more directive
+        instruction_text = f"If relevant, consider the following user instruction: '{instruction}'. Otherwise, ignore it." if instruction else ""
+
+        prompt = f"""You are a {character_a}, tasked with creating an engaging and informative introduction for an article. The introduction should be based on the provided reference content and aligned with the central theme of the article. Here are your instructions:
+        - Central theme: '{main_idea}'
+        - Task name: '{task_name}'
+        - Language: {language}
+        - Reference content provided: {('Yes' if knowledge_content else 'No')}
+        {instruction_text}
+        Ensure that the introduction:
+        1. Demonstrates expertise in the field.
+        2. Provides rich content that guides the reader into the full text.
+        3. Is concise, ideally around 30 words.
+        4. Presents the text in bullet points.
+        Based on these guidelines, generate the first paragraph.
         """
         ans = ask_llm(self.session, prompt)
         return ans
+
 
 
     def _get_muti_sub_idea(
@@ -114,15 +121,24 @@ class MarkdownGenerator:
         instruction: Optional[str] = None
     ) -> str:
         """
-        Generate multiple sub-themes based on the task name, central theme, and the content of the first paragraph.
+        Generate multiple distinct sub-themes based on the task name, central theme, and the content of the first paragraph.
         """
-        instruction_text = f" Consider this additional guidance for breaking down the themes: '{instruction}'." if instruction else ""
-        
-        prompt = f"""You're a {character_a}. Based on the reference content I gave you, please break down the central theme into multiple sub-themes according to the task name, central theme, and the content of the first paragraph. {instruction_text} Please arrange them in a logical order. \n\n Reference content: \n{knowledge_content}\n\n. No matter what the input language is, you must output text in {language}.
-        The task name is "{task_name}", the central topic is "{main_idea}", and the first paragraph of the article is "{introduction}". Please break down the central topic into several sub-topics as the point of view of the essay. Brief content is required. Less than 15 words per subtopic. The format is \n1. \n2.
+        # Enhanced instruction text with explicit formatting requirements
+        instruction_text = f"Ensure each sub-theme is distinct and clearly differentiated from others. Format them as a numbered list. If relevant, consider the following user instruction: '{instruction}'. Otherwise, ignore it." if instruction else "Ensure each sub-theme is distinct and clearly differentiated from others. Format them as a numbered list."
+
+        prompt = f"""You are a {character_a} specialized in creating structured content. Your task is to dissect the central theme into multiple, distinct sub-themes based on the provided background. These sub-themes should each address a unique aspect of the central theme '{main_idea}', drawing from the task '{task_name}' and the introductory content.
+        {instruction_text}
+        Reference content includes:\n{knowledge_content}\n
+        Ensure each sub-theme:
+        1. Is concise, under 15 words.
+        2. Reflects a unique aspect of the main idea.
+        3. Is logically ordered to guide the reader through the article.
+        No matter the input language, output must be in {language}.
+        Output the sub-ideas in the format: \n1. \n2.
         """
         ans = ask_llm(self.session, prompt)
         return ans
+
 
 
     def _get_sub_content(
@@ -138,37 +154,56 @@ class MarkdownGenerator:
         """
         Generate a paragraph of specific content based on the given task, main idea, sub idea, and character.
         """
-        instruction_text = f" Please incorporate the following user instruction into the content if relevant: '{instruction}'." if instruction else ""
-        
+        # Enhanced instruction text to be clearer and directive
+        instruction_text = f"If relevant, consider the following user instruction: '{instruction}'. Otherwise, ignore it." if instruction else ""
+
         prompt = f"""
-        You're a {character_a}. Please, according to the task I have assigned to you, the central theme, generate a whole paragraph of specific content based on this sub-theme as part of the whole article. {instruction_text} \n\n can refer to: \n{knowledge_content}\n\n. No matter what the input language is, you must output text in {language}.
-        Based on the background information of task {task_name} and main topic {main_idea}, output the content of the subtopic {sub_idea} in the subtopic of {task_name}. The content of the subtopic must be 200 characters, and the content is output in bullet points. The meaning must be fully expressed.
+        You are a {character_a}, tasked with developing detailed content for a specific sub-theme of an article. Your objective is to produce a paragraph that deeply explores the sub-theme '{sub_idea}', which should be informative and aligned with the overall central theme '{main_idea}' and the specific task '{task_name}'.
+        {instruction_text}
+        Reference content provided includes:\n{knowledge_content}\n
+        Please generate the content with the following requirements:
+        1. The paragraph should be concise, aiming for about 200 characters.
+        2. Present the information in bullet points to enhance clarity and readability.
+        3. Ensure that the content is rich and fully expresses the meaning of the sub-theme.
+        Ensure all content is delivered in {language}.
         """
         ans = ask_llm(self.session, prompt)
         return ans
 
+
     def _get_end_sentence(
-    self,
-    task_name: str,
-    main_idea: str,
-    introduction: str,
-    sub_idea: str,
-    character_a: str,
-    language: str = "English",
-    instruction: Optional[str] = None
-) -> str:
+        self,
+        task_name: str,
+        main_idea: str,
+        introduction: str,
+        sub_idea: str,
+        character_a: str,
+        language: str = "English",
+        instruction: Optional[str] = None
+    ) -> str:
         """
         Generate the content of the last paragraph based on the task name, the central theme of the article,
         the introduction, sub-ideas, and optionally, specific user instructions.
         """
-        # Include user instruction in the prompt if provided
-        instruction_text = f" Additionally, consider the following specific instruction: '{instruction}'." if instruction else ""
+        # Enhance the instruction text to be clearer and more directive
+        instruction_text = f" If relevant, consider the following user instruction: '{instruction}'. Otherwise, ignore it." if instruction else ""
         
-        prompt = f"""You are a {character_a}. Please create the content of the last paragraph based on the task name, the central theme of the article, the content of the first paragraph, and the main content of the article based on the reference content I gave you, and it is required to echo the first paragraph. {instruction_text} No matter what the input language is, you must output text in {language}.
-        Finish the article based on the task name of "{task_name}", the central theme of "{main_idea}", the article content of "{sub_idea}", and the first paragraph of "{introduction}". The generated ending must correspond with the first paragraph of the article and incorporate any relevant aspects of the provided instruction if applicable. The conclusion should be about 50 words, and the output is in bullet points.
+        prompt = f"""
+        You are a {character_a}, tasked with crafting the concluding paragraph for an article. This conclusion should reflect and summarize the key points from the entire article, including the introduction and sub-topics discussed, while ensuring it resonates with the central theme '{main_idea}'.
+        {instruction_text}
+        Task details:
+        - Task name: '{task_name}'
+        - Main content from sub-topics: '{sub_idea}'
+        - Introduction summary: '{introduction}'
+        Please ensure that the conclusion:
+        1. Echoes the key insights from the first paragraph.
+        2. Incorporates relevant details from the entire article.
+        3. Is concise, approximately 30 words, and presented in bullet points for clarity.
+        Output must be in {language}.
         """
         ans = ask_llm(self.session, prompt)
         return ans
+
 
 # ==============================================================================
 # markdown updater (internal use)
@@ -373,12 +408,12 @@ class MarkdownGenerator:
 
         # Get the article summary
         article_summary = self.main_idea_knowledge
-
+        print("article_summary is \n", article_summary)
         # Get the main idea
         main_idea = self._get_main_idea(
             task_name, character_a, knowledge_content=article_summary, instruction=instruction
         )
-
+        print("main_idea is \n", main_idea)
         # Get the title name
         title_name = self._get_title_name(main_idea, instruction=instruction)
         title_name =  "# " + title_name + "\n"
@@ -482,10 +517,43 @@ class MarkdownGenerator:
         
     def update_md(self, path, opinion):
         """
-        Update the markdown content.
-        first step ask llm to parse opinions into three categories : revise/delete/regenrate the content based on the feedback.
-        then call the respective function to update the content.
+        Update the markdown content based on the provided opinion.
+        Ask the LLM to categorize the opinion and return the category along with any relevant details in a structured format.
+        If the action involves 'revise' or 'delete', include the page number; otherwise, return an empty string for the detail.
         """
+        prompt = f"""
+        Analyze the following user input: '{opinion}'. Categorize the input  into 'revise', 'delete', 'regenerate', or 'other'.
+        'revise' means revise the certain page based on the opinion.
+        'delete' means delete the certain page based on the opinion.
+        'regenerate' means regenerate the whole markdown file based on the opinion.
+        'other' means other operations that do not fall into the above categories.
+        Return the response in the following format:
+        - If the category is 'revise' or 'delete', format should be: ['category', 'page number'], here 'page number' refers to the page number to be revised or deleted.
+        - For all other categories, format should be: ['category', '']
+        """
+
+        # Example call to LLM with the session and prompt
+        response = ask_llm(self.session, prompt)
+        # Assuming response format is a string that needs parsing
+        response_elements = response.strip("[]").replace("'", "").split(',')
+        category = response_elements[0].strip().lower()
+
+        if category in ['revise', 'delete'] and len(response_elements) > 1:
+            page_number = int(response_elements[1].strip())
+            if category == 'revise':
+                self._revise_md(page_number, opinion, path)
+                return f"revised page {page_number}"
+            elif category == 'delete':
+                self._delete_md(page_number, path)
+                return f"deleted page {page_number}"
+        else:
+            if category == 'regenerate':
+                self.generate_md_artical(path, instruction=opinion)
+                return "Regenerating the slides"
+            else:
+                return "Please give a more specific instruction"
+
+
 
 
 if __name__ == "__main__":

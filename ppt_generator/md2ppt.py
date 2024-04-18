@@ -4,7 +4,7 @@ from io import BytesIO
 
 import markdown
 import requests as req
-from config import PPT_DIR, PPT_MODE_DIR
+from ppt_generator.config import PPT_DIR, PPT_MODE_DIR, IMG_DESCRIPTION_DIC_PATH, LLM_ARGS
 from PIL import Image
 from PIL.ImageQt import rgb
 from pptx import Presentation
@@ -13,10 +13,10 @@ from pptx.enum.text import MSO_AUTO_SIZE, MSO_VERTICAL_ANCHOR
 from pptx.slide import Slide
 from pptx.text.text import Font
 from pptx.util import Cm, Inches, Pt
+from ppt_generator.utils import read_json, extract_text_using_regex,get_random_file, dump_json, calculate_edit_distance
 
 #from ppt_generator.content_generator.img_search import get_img
-from markdown_parser import Heading, Out, parse_str
-from utils import get_random_file
+from ppt_generator.markdown_parser import Heading, Out, parse_str
 
 """
 This module contains the PptGenerator class, which is used to convert a markdown string into a PowerPoint presentation.
@@ -39,7 +39,7 @@ class PptGenerator:
     theme: str = None
 
     def __init__(
-        self, md_str: str, theme_path: str, save_path: str = PPT_DIR + "test.pptx"
+        self,client, img_dic, md_str: str, theme_path: str, save_path: str = PPT_DIR + "test.pptx"
     ) -> None:
         self.theme = theme_path
         theme_param_path = os.path.join(self.theme, "mode.json")
@@ -48,13 +48,15 @@ class PptGenerator:
 
         self.init_pptx(theme_path)
         self.init_markdown(md_str)
+        self.client = client
         # generate the title page
         MD2TitleSlide(self.prs, self.theme, self.ppt_main_theme)
         # prepare the image for the main page
-        self.img_dicts = []
+        self.img_dic = img_dic
         # generate the slides
         self.traverse_tree(self.tree)
         self.prs.save(save_path)
+
 
     def init_pptx(self, theme_path: str = PPT_MODE_DIR + "1") -> None:
         """
@@ -124,11 +126,15 @@ class PptGenerator:
                 title = (
                     heading.text if content_i == 0 else ""
                 )  # if it's the first slide (main page)
+                img_path = ''
+                for key, value in self.img_dic.items():
+                    if calculate_edit_distance(value, heading.text) <= 2:
+                        img_path = key
                 MD2Slide(
                     self.prs,
                     self.theme,
                     title,
-                    img_dict=img_dict,
+                    img_path = img_path,
                     content=input_text.strip(),
                 )
 
@@ -163,7 +169,7 @@ class MD2Slide:
     content_box = (Cm(2.54), Cm(4.12), Cm(20.32), Cm(12.70))
 
     def __init__(
-        self, presentation, theme_path, title, content, *args, img_dict={}, **kwargs
+        self, presentation, theme_path, title, content, *args, img_path='', **kwargs
     ):
         self.presentation = presentation
         self.slide = presentation.slides.add_slide(presentation.slide_layouts[6])
@@ -207,8 +213,8 @@ class MD2Slide:
         self.init_slide()
         self.init_title()
         self.init_content()
-        if page_params.get("img_info") and img_dict:
-            self.img_url = img_dict["thumbnail"]
+        if page_params.get("img_info") and img_path:
+            self.img_path = img_path
             # img_orginal_h = img_dict["height"]
             # img_orginal_w = img_dict["width"]
             # img_h = float(page_params["img_info"]["width"])*float(img_orginal_h)/float(img_orginal_w)
@@ -236,10 +242,7 @@ class MD2Slide:
         # picture.height = self.presentation.slide_height
 
     def init_img(self):
-        response = req.get(self.img_url)
-        image = Image.open(BytesIO(response.content))
-        image.save("temp_img.png")
-        picture = self.slide.shapes.add_picture("temp_img.png", *self.img_box)
+        picture = self.slide.shapes.add_picture(self.img_path, *self.img_box)
 
     def init_font(self, **kwargs):
         if "font_name" in kwargs:

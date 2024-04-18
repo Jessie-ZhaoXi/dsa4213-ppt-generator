@@ -17,13 +17,14 @@ poetry install
 If you do not have an existing API key:
     Go to https://h2ogpte.genai.h2o.ai/settings, > APIs Tab, click 'New API key'
 
-Save the API key and address to your enviornmental variables
+Save the API key and address to your environmental variables
+```bash
+touch .env
 ```
-export H2OGPTE_API_TOKEN='YOUR_KEY'
+and then save and edit your enviroment variables inside the `.env` file
 ```
-
-```
-export H2OGPTE_URL=https://h2ogpte.genai.h2o.ai  
+H2OGPTE_API_TOKEN='YOUR_KEY'
+H2OGPTE_URL=https://h2ogpte.genai.h2o.ai
 ```
 
 To run the wave app, check that your present working directory is at /frontend_explore
