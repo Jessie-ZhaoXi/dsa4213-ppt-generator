@@ -1,3 +1,5 @@
+import sys
+sys.path.append('..')
 from h2o_wave import Q, app, main, on, site, ui, run_on, copy_expando
 import os
 import logging
@@ -9,6 +11,7 @@ from src.doc_qna_h2ogpte import QnAManager, H2OGPTEClient
 from src.utils import loading
 from src.constants import *
 from src.layout import get_header_card, layout, get_home_items
+
 
 logging.basicConfig(level=logging.INFO)
 

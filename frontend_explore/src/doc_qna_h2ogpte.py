@@ -5,7 +5,7 @@ import os, glob
 import asyncio
 import datetime
 import json
-from ppt_generator.main import oneshot_generate_ppt
+#from ppt_generator.main import oneshot_generate_ppt
 
 logging.basicConfig(level=logging.INFO)
 
