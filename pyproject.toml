@@ -13,6 +13,7 @@ markdown = "^3.6"
 h2o-wave = "^1.1.1"
 tqdm = "^4.66.2"
 toml = "^0.10.2"
+levenshtein = "^0.25.1"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.4"
