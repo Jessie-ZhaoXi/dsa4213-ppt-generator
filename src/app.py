@@ -15,7 +15,7 @@ from src.layout import get_header_card, layout, get_home_items
 
 logging.basicConfig(level=logging.INFO)
 
-collection_name='supersonic_rocket_ppt_generator'
+collection_name=H2OGPTE_SETTINGS.COLLECTION_NAME
 collection_description="created for DSA4213 project"
 
 llm = "mistralai/Mixtral-8x7B-Instruct-v0.1"
@@ -39,7 +39,7 @@ async def serve(q: Q):
     await run_on(q)
 
 
-async def initialize_app(q): 
+async def initialize_app(q: Q): 
     q.app.h2ogpte_keys = {
                 "address": H2OGPTE_SETTINGS.H2OGPTE_URL,
                 "api_key": H2OGPTE_SETTINGS.H2OGPTE_API_TOKEN,
@@ -60,7 +60,7 @@ async def chatbot(q: Q):
 @on()
 async def questions(q: Q):
     '''
-    triggers on_generating function, which initiates a H20GPTE client instanc.
+    triggers on_generating function, which initiates a H20GPTE client instance.
     returns the Response.
     '''
     data = q.client.texts['questions_data']
@@ -68,7 +68,7 @@ async def questions(q: Q):
     await on_generating(q, question_prompt)
 
 
-async def on_generating(q, question_prompt):
+async def on_generating(q: Q, question_prompt: str):
     q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
     q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)
     q.page["card_1"].data += [question_prompt, True]
@@ -131,7 +131,9 @@ async def file_upload(q: Q):
                 q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
                 q.client.collection_request_id = q.app.h2ogpte.create_collection(collection_name, collection_description)
                 q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)
+                # ingest the file to the collection and save the MarkdownGenerator object in q.app.h2ogpte.article_md
                 await q.run(q.app.h2ogpte.ingest_filepath, q.client.path, q.client.collection_request_id)
+                print(q.app.h2ogpte.article_md)
                 await get_home_items(q, flag="uploaded")
         await q.page.save()
     except:
@@ -163,7 +165,7 @@ async def reset(q: Q):
     await q.page.save()
 
 
-def delete_filepath(filepath):
+def delete_filepath(filepath: str):
     import os
     try:
         os.unlink(filepath)
