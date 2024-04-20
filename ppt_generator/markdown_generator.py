@@ -4,7 +4,9 @@ from h2ogpte import Session
 from ppt_generator.config import LLM_ARGS
 from ppt_generator.utils import *
 import os
-
+"""
+This module contains the MarkdownGenerator class that generates markdown content for articles based on a given task and reference content.
+"""
 
 class MarkdownGenerator:
 
@@ -54,7 +56,7 @@ class MarkdownGenerator:
         prompt = f"""You are a {character_a}. You can generate specific central themes based on a task. No matter what the input language is, you must output text in {language}.
         There is a task "{task_name}". Please generate the main idea of the article of this task type based on the reference content of the uploaded PDF I gave you. {instruction_text} If the reference content has no information reference, the topic can be generated in line with the task. \n\n Please generate more specific topics. Be creative and imaginative. Reply in 50 words or less. Don't add anything else.
         """
-        
+
         ans = ask_llm(self.session, prompt)
         return ans
 

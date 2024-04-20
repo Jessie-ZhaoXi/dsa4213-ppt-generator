@@ -72,7 +72,24 @@ def main():
         min_sub_idea_num = len(image_list) + 1
         max_sub_idea_num = min_sub_idea_num + 2
         instruction = f"please generate at least {min_sub_idea_num} number of sub-ideas to include idea in {image_list}, with each one as a individual sub-idea" if image_list else ""
-        article_md=oneshot_generate_ppt(client, session, task_name, min_sub_idea_num, max_sub_idea_num, instruction=instruction)
+        # Generate the markdown file
+        print("Generating markdown file ...")
+        article_md = MarkdownGenerator(session, min_sub_idea_num = min_sub_idea_num, max_sub_idea_num = max_sub_idea_num)
+        print("create markdown generator")
+        article_md.generate_md_artical(
+            save_path=MD_DIR, instruction=instruction
+        )
+        md_content = article_md.combine_mds(MD_DIR, task_name)
+        image_mapping_dic = generate_ppt_image_mapping(IMG_DESCRIPTION_DIC_PATH, md_content, client)
+        # Generate the ppt
+        for i in range(1, 3):  # generate two modes of ppt
+            PptGenerator(
+                client,
+                image_mapping_dic,
+                md_content,
+                PPT_MODE_DIR + str(i),
+                save_path=PPT_DIR + task_name + "_mode" + str(i) + ".pptx",
+            )
         # update the marlkdown file
         """ 
         output_mag = article_md.update_md(path = MD_DIR, opinion= "haha just joking i'm testing")

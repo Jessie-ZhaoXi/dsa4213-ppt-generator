@@ -7,7 +7,7 @@ from .utils import get_body, get_questions
 
 text_heading = "<font size=4><b>{}</b></font>"
 themes = [ui.theme(
-                name='legal-theme',
+                name='ppt-generator-theme',
         primary='#d97300',
         text='#ffffff',
         card='#000000',
@@ -27,7 +27,7 @@ async def layout(q: Q):
     q.page["meta"] = ui.meta_card(
         box="",
         themes=themes,
-        theme="legal-theme",
+        theme="ppt-generator-theme",
         title="🚀 PPT generator",
         script=heap_analytics(
             userid=q.auth.subject,

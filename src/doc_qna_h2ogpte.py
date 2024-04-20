@@ -1,11 +1,15 @@
 from h2ogpte import H2OGPTE
 from h2ogpte.types import ChatMessage, PartialChatMessage
 import logging
-import os, glob
+import glob
 import asyncio
 import datetime
 import json
-from ppt_generator.main import oneshot_generate_ppt
+from ppt_generator.config import *
+from ppt_generator.markdown_generator import MarkdownGenerator
+from ppt_generator.utils import *
+from ppt_generator.md2ppt import PptGenerator
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -109,11 +113,17 @@ class H2OGPTEClient:
         else:
             logging.info(f'File {filename} already ingested')
         # Add one-shot generate ppt
-        # chat_session_id = self.client.create_chat_session(collection_id)
-        # with self.client.connect(chat_session_id) as session:
-        #     oneshot_generate_ppt(session, filepath, filename)
+        chat_session_id = self.client.create_chat_session(collection_id)
+        with self.client.connect(chat_session_id) as session:
+            print("Generating markdown file ...")
+            article_md = MarkdownGenerator(session, min_sub_idea_num = 2, max_sub_idea_num = 6)
+            print("create markdown generator")
+            article_md.generate_md_artical(
+                save_path=MD_DIR, instruction=None
+            )
+            md_content = article_md.combine_mds(MD_DIR, "attention")
         return
-    
+
     def _get_collection_chunks(self, collection_id):
         chunk_sizes = 80
         while True:
