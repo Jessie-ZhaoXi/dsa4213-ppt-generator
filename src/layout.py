@@ -8,12 +8,12 @@ from .utils import get_body, get_questions
 text_heading = "<font size=4><b>{}</b></font>"
 themes = [ui.theme(
                 name='legal-theme',
-        primary='#dbcc42',
+        primary='#d97300',
         text='#ffffff',
         card='#000000',
         page='#1D1D1D',
             )]
-
+        # #003882
 async def layout(q: Q):
     q.app.toml = toml.load("app.toml")
     zones = [
@@ -28,7 +28,7 @@ async def layout(q: Q):
         box="",
         themes=themes,
         theme="legal-theme",
-        title="BrLawGPT",
+        title="🚀 PPT generator",
         script=heap_analytics(
             userid=q.auth.subject,
             event_properties=f"{{"
@@ -54,7 +54,7 @@ def get_header_card(q, items):
     items = items + [ui.menu(
             icon='Globe',
             items=[
-                ui.command(name='english', label='English 🇺🇸'),
+                ui.command(name='english', label='English 🇸🇬'),
             ])]
     return ui.header_card(
         box="zone_0",
@@ -102,7 +102,7 @@ async def display_chat_view(q: Q):
             rows=rows,
         ),
         events=["stop"],
-        name="chatbot_brlaw",
+        name="chatbot_ppter",
         )
     await q.page.save()
 

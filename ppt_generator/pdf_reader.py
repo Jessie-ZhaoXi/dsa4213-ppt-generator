@@ -26,7 +26,7 @@ def ingest_documents(
     #dump_json(pdf_reader.dic, json_path)
 
 
-    text_path = 'data/attention.txt'
+    text_path = './data/attention.txt'
 
 
     file_path = (
