@@ -17,6 +17,8 @@ from ppt_generator.utils import read_json, extract_text_using_regex,get_random_f
 
 #from ppt_generator.content_generator.img_search import get_img
 from ppt_generator.markdown_parser import Heading, Out, parse_str
+import subprocess
+import platform
 
 """
 This module contains the PptGenerator class, which is used to convert a markdown string into a PowerPoint presentation.
@@ -27,6 +29,16 @@ This module contains the PptGenerator class, which is used to convert a markdown
 """
 
 
+def get_os():
+    os_name = platform.system()
+    if os_name == "Darwin":
+        return "macOS"
+    elif os_name == "Windows":
+        return "Windows"
+    else:
+        return os_name  # Linux or other
+    
+os_name=get_os()
 class PptGenerator:
     """
     Converts a markdown string into a PowerPoint presentation.
@@ -37,9 +49,10 @@ class PptGenerator:
     out: Out = None
     tree: Heading = None
     theme: str = None
+    operation_system: str = os_name
 
     def __init__(
-        self,client, img_dic, md_str: str, theme_path: str, save_path: str = PPT_DIR + "test.pptx"
+        self, client, img_dic, md_str: str, theme_path: str, save_path: str = PPT_DIR + "test.pptx"
     ) -> None:
         self.theme = theme_path
         theme_param_path = os.path.join(self.theme, "mode.json")
@@ -55,7 +68,11 @@ class PptGenerator:
         self.img_dic = img_dic
         # generate the slides
         self.traverse_tree(self.tree)
+        # save the ppt
         self.prs.save(save_path)
+        if self.operation_system == "macOS": # convert to pdf if the operation system is macOS
+            full_path = os.path.abspath(save_path) # get the full path of the ppt
+            self.convert_to_pdf_with_powerpoint(ppt_path=full_path, pdf_path=full_path.replace(".pptx", ".pdf"))
 
 
     def init_pptx(self, theme_path: str = PPT_MODE_DIR + "1") -> None:
@@ -143,6 +160,24 @@ class PptGenerator:
             for child in heading.children:
                 self.traverse_tree(child)
 
+    def convert_to_pdf_with_powerpoint(self, ppt_path: str, pdf_path: str)->None:
+        # AppleScript to open PPT, save as PDF, and close
+        applescript = f'''
+        tell application "Microsoft PowerPoint"
+            try
+                set pptPath to POSIX file "{ppt_path}" as string
+                open pptPath
+                set theDoc to active presentation
+                set pdfPath to POSIX file "{pdf_path}" as string
+                save theDoc in pdfPath as save as PDF
+                close theDoc saving no
+            on error errMsg number errNum
+                display dialog "Error: " & errMsg & " Error Number: " & errNum
+            end try
+        end tell
+        '''
+        # Run the AppleScript
+        subprocess.run(["osascript", "-e", applescript], check=True)
 
 class MarkdownCategory:
     TITLE = "#"
