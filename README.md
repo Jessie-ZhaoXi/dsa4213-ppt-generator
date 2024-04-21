@@ -15,17 +15,30 @@ Also, we have to click the first link here in order to access the app ![image](h
 
 We have to manually install the wave binary and run it as the h2o_wave python package cannot initialise the wave server. 
 
-## Quick Start
-Install the required python dependencies
+## Quick start in your local machine
+
+Clone this GitHub repo and cd to its directory
+
+```bash
+git clone https://github.com/Jessie-ZhaoXi/dsa4213-ppt-generator.git
+cd dsa4213-ppt-generator
 ```
+
+Create venv and pip install the required python dependencies
+
+```
+virtualenv venv
+source venv/bin/activate
 pip install -r requirements.txt
 ```
-Or install dependencies with `poetry`
+Or use `poetry` install dependencies and create venv
 ```bash
 # project using Python version 3.10.6 currently
 # export dependencies to a requirements.txt file without hashes to decrease time to resolve dependencies
 # poetry export --without-hashes --format=requirements.txt > requirements.txt
 poetry install
+# run below command if your OS is Linux or Windows
+poetry add spire
 ```
 
 ### Getting the API keys
@@ -40,6 +53,8 @@ and then save and edit your enviroment variables inside the `.env` file
 ```
 H2OGPTE_API_TOKEN='YOUR_KEY'
 H2OGPTE_URL=https://h2ogpte.genai.h2o.ai
+# COLLECTION_NAME="supersonic_rocket_ppt_generator"
+# LLM="gpt-4-1106-preview"
 ```
 ### Preprocess to extract the images from PDF
 We are use Spire.PDF to extract the images, and currently this package has some conflicts when running with the frontend's framework (THIS PACKAGE CANNOT BE INSTALLED IN MACOS). Therefore our current approach is to run this step before we run our wave app. Please upload the pdf file under 'uploaded_files' folder and run the following code. Suppose you uploaded 'attention.pdf' in this folder then the code will be
@@ -47,8 +62,8 @@ We are use Spire.PDF to extract the images, and currently this package has some 
 cd dsa4213-ppt-generator/ && python pdf_reader.py uploaded_files/attention.pdf data
 ```
 
-### Run the Wave APP
-To run the wave app, check that your present working directory is at /frontend_explore
+### Run the Wave APP entrypoint
+To run the wave app, check that your present working directory is at /dsa4213-ppt-generator
 ```
 wave run src/app.py
 ```
