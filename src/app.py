@@ -2,15 +2,16 @@ import sys
 sys.path.append('..')
 from h2o_wave import Q, app, main, on, site, ui, run_on, copy_expando
 import os
+import pandas as pd
 import logging
 from pathlib import Path
 import requests
 from src.texts_app import texts_app_en
 from ppt_generator.config import H2OGPTE_SETTINGS
 from src.doc_qna_h2ogpte import QnAManager, H2OGPTEClient
-from src.utils import loading
+from src.utils import loading, refresh_ppt_preview, ui_table_from_df
 from src.constants import *
-from src.layout import get_header_card, layout, get_home_items
+from src.layout import get_header_card, layout, get_home_items, get_questions, display_chat_view
 
 
 logging.basicConfig(level=logging.INFO)
@@ -116,6 +117,27 @@ async def generate_ppt(q: Q, instruction: str):
         # Ensure `generate_ppt` method exists and is properly defined to handle the instruction.
         if hasattr(q.app.h2ogpte, 'generate_ppt'):
             msg = q.app.h2ogpte.generate_ppt(instruction, q.client.collection_request_id)
+            await refresh_ppt_preview(q, local_path = './my_ppts/Presentation_mode_2.pdf')
+            preview_path = q.client.remote_preview_path
+            text_heading = "<font size=4><b>{}</b></font>"
+            data = q.client.texts['questions_data']
+            table_name = q.client.texts['table_name']
+            min_widths = {table_name: '350px'}
+            initial_petition = q.client.texts['initial_petition']
+            df = pd.DataFrame(data)
+            df.rename(columns={'Question': table_name}, inplace=True)
+            items = [
+                ui_table_from_df(df, name='questions', sortables=[table_name], link_col=table_name, min_widths=min_widths, height= '200px'),
+                ui.text(text_heading.format(initial_petition)),
+                ui.text(f"""<object data="{preview_path}" type="application/pdf" width="100%" height="450px"></object>""")
+                ]
+            # items = await get_questions(q)
+            # q.page["header"] = get_header_card(q, [ui.button(name='reset', label=q.client.texts['back_botton'], primary=True, icon='ArrowDownRight')])
+            q.page["sidebar"] = ui.form_card(
+                box=ui.box('zone_1_1'),
+                items=items)
+            await q.page.save()
+            # await display_chat_view(q)
             q.page["card_1"].data += [msg, True]
         else:
             q.page["card_1"].data += ["PPT generation method not found in the client.", True]

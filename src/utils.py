@@ -121,9 +121,9 @@ async def get_questions(q):
     # print('q.client.remote_path', q.client.remote_path)
     min_widths = {table_name: '350px'}
     # pdf_preview_element = await refresh_ppt_preview(q, local_path = './my_ppts/Presentation_mode_2.pdf')
-    await refresh_ppt_preview(q, local_path = './my_ppts/Presentation_mode_2.pdf')
+    await refresh_ppt_preview(q, local_path = q.client.path)
     preview_path = q.client.remote_preview_path
-    print("***** calling get_questionspreview_path:" + preview_path)
+    print("### calling get_questions:: preview_path:" + preview_path)
     items = [
         ui_table_from_df(df, name='questions', sortables=[table_name], link_col=table_name, min_widths=min_widths, height= '200px'),
         ui.text(text_heading.format(initial_petition)),
@@ -137,7 +137,7 @@ async def refresh_ppt_preview(q, local_path):
     This function takes in path of the PDF and updates the preview, by updating the q.client.remote_preview_path parameter.
     '''
     q.client.local_preview_path = local_path
-    print("#### calling refresh_ppt_preview function" + q.client.local_preview_path)
+    print("### calling refresh_ppt_preview function" + q.client.local_preview_path)
     q.client.remote_preview_path, = await q.site.upload([q.client.local_preview_path])
     print("### remote_path" + q.client.remote_preview_path)
     # q.client.pdf_preview_element = ui.text(f"""<object data="{q.client.remote_preview_path}" type="application/pdf" width="100%" height="450px"></object>""")
