@@ -1,4 +1,4 @@
-# "Transformer Model: Advancing Sequence Transduction with Self-Attention"
+# "Transformer: Self-Attention for Improved Sequence Transduction"
 
 ## Introduction
 

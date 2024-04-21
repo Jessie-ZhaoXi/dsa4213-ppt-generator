@@ -140,13 +140,16 @@ class H2OGPTEClient:
         try:
             chat_session_id = self.client.create_chat_session(collection_id)
             with self.client.connect(chat_session_id) as session:
-                print("Generating markdown file ...")
-                article_md = MarkdownGenerator(session, min_sub_idea_num = 2, max_sub_idea_num = 6)
+                image_list = read_image_description()
+                min_sub_idea_num = len(image_list) + 1
+                max_sub_idea_num = min_sub_idea_num + 2
+                generate_instruct = f"please generate at least {min_sub_idea_num} number of sub-ideas to include idea in {image_list}, with each one as a individual sub-idea" if image_list else ""
                 print("create markdown generator")
+                article_md = MarkdownGenerator(session, min_sub_idea_num = min_sub_idea_num, max_sub_idea_num = max_sub_idea_num)
                 print("Generating markdown file ...")
                 # Assuming MD_DIR and other constants are defined
-                article_md.generate_md(
-                    path=MD_DIR, opinion=instruction
+                msg = article_md.generate_md(
+                    path=MD_DIR, opinion=instruction, generate_instruct = generate_instruct
                 )
                 md_content = article_md.combine_mds(MD_DIR, "attention")
                 image_mapping_dic = generate_ppt_image_mapping(IMG_DESCRIPTION_DIC_PATH, md_content, self.client)
@@ -161,6 +164,7 @@ class H2OGPTEClient:
                         save_path=f"{PPT_DIR}Presentation_mode_{str(i)}.pptx",
                     )
                 print("PPT generation completed successfully.")
+                return msg
         except Exception as e:
             print(f"Error in generating PPT: {e}")
 

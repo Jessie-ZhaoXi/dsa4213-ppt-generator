@@ -110,30 +110,13 @@ async def file_upload(q: Q):
           await get_home_items(q, flag="home")
           await q.page.save()
 
-    # try:
-    #     filename = q.client['file_upload']
-    #     print(f'******{filename}')
-    #     q.client.path = Path('./uploaded_files/' + filename)
-    #     await loading(q)
-    #     q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
-    #     q.client.collection_request_id = q.app.h2ogpte.create_collection(f'collection_{filename}', f'Collection for {filename}')
-    #     q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)
-    #     await q.run(q.app.h2ogpte.ingest_filepath, q.client.path, q.client.collection_request_id)
-    #     q.page['meta'].dialog = None
-    #     await get_home_items(q, flag="uploaded")
-    #     await q.page.save()
-    # except:
-    #     q.page['meta'].dialog = None
-    #     await get_home_items(q, flag="home")
-    #     await q.page.save()
-
 async def generate_ppt(q: Q, instruction: str):
     try:
         print("Generating PPT...")
         # Ensure `generate_ppt` method exists and is properly defined to handle the instruction.
         if hasattr(q.app.h2ogpte, 'generate_ppt'):
-            await q.app.h2ogpte.generate_ppt(instruction, q.client.collection_request_id)
-            q.page["card_1"].data += ["PPT generation successful.", True]
+            msg = q.app.h2ogpte.generate_ppt(instruction, q.client.collection_request_id)
+            q.page["card_1"].data += [msg, True]
         else:
             q.page["card_1"].data += ["PPT generation method not found in the client.", True]
     except Exception as e:

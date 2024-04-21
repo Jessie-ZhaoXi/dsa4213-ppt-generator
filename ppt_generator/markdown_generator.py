@@ -517,20 +517,20 @@ class MarkdownGenerator:
         print(f"Combined document saved to {output_path}")
         return combined_content
         
-    def generate_md(self, path, opinion):
+    def generate_md(self, path, opinion, generate_instruct):
         """
         Update the markdown content based on the provided opinion.
         Ask the LLM to categorize the opinion and return the category along with any relevant details in a structured format.
         If the action involves 'revise' or 'delete', include the page number; otherwise, return an empty string for the detail.
         """
         prompt = f"""
-        Analyze the following user input: '{opinion}'. Categorize the input  into 'revise', 'delete', 'regenerate', 'first_generate', or 'other'.
+        Analyze the following user input: '{opinion}'. Categorize the input  into 'revise', 'delete', 'regenerate', 'generate', or 'other'.
         'revise' means revise the certain page based on the opinion.
         'delete' means delete the certain page based on the opinion.
         'regenerate' means regenerate the whole markdown file based on the opinion.
-        'first_generate' means generate the whole markdown file based on the opinion.
-        'other' means other operations that do not fall into the above categories.
-        Return the response in the following format:
+        'generate' means generate the whole markdown file based on the opinion.
+        'other' means other operations that do not fall into the above categories, or some irelavant input.
+        Return the response strictly in the following format:
         - If the category is 'revise' or 'delete', format should be: ['category', 'page number'], here 'page number' refers to the page number to be revised or deleted.
         - For all other categories, format should be: ['category', '']
         """
@@ -546,16 +546,17 @@ class MarkdownGenerator:
             page_number = int(response_elements[1].strip())
             if category == 'revise':
                 self._revise_md(page_number, opinion, path)
-                return f"revised page {page_number}"
+                return f"Revised page {page_number}. Slides have been saved locally"
             elif category == 'delete':
                 self._delete_md(page_number, path)
-                return f"deleted page {page_number}"
+                return f"Deleted page {page_number}. Slides have been saved locally"
         else:
-            if category == 'regenerate' or category == 'first_generate':
+            if category == 'regenerate' or category == 'generate':
+                opinion = generate_instruct + " " + opinion
                 self.generate_md_artical(path, instruction=opinion)
-                return "Regenerating the slides"
+                return "PPT generation successful. Slides have been saved locally"
             else:
-                return "Please give a more specific instruction"
+                return "Please give a more relavant instruction"
 
 
 
