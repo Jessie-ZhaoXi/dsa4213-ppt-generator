@@ -68,11 +68,10 @@ class PDF_Reader:
 if __name__ == '__main__':
   parser = ArgumentParser(description = 'Horn Schunck program')
   parser.add_argument('pdf_path', type = str, help = 'Path of the pdf file')
-  parser.add_argument('data_folder', type = str, help='Path of the data folder')
   args = parser.parse_args()
 
-  if not os.path.exists(args.data_folder):
-    os.mkdir(args.data_folder + "/")
+  if not os.path.exists('data'):
+    os.mkdir('data' + "/")
 
    
   h2ogpte_keys = {
@@ -82,7 +81,7 @@ if __name__ == '__main__':
   client = H2OGPTE(h2ogpte_keys['address'], h2ogpte_keys['api_key'])
   pdf_reader = PDF_Reader()
   pdf_reader.load_pdf(args.pdf_path)
-  image_output_folder = args.data_folder
+  image_output_folder = 'data'
   pdf_reader.extract_text_and_image(image_output_folder, client)
   json_path = IMG_DESCRIPTION_DIC_PATH
   dump_json(pdf_reader.dic, json_path)
