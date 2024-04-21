@@ -70,9 +70,8 @@ class PptGenerator:
         self.traverse_tree(self.tree)
         # save the ppt
         self.prs.save(save_path)
-        if self.operation_system == "macOS": # convert to pdf if the operation system is macOS
-            full_path = os.path.abspath(save_path) # get the full path of the ppt
-            self.convert_to_pdf_with_powerpoint(ppt_path=full_path, pdf_path=full_path.replace(".pptx", ".pdf"))
+        full_path = os.path.abspath(save_path) # get the full path of the ppt
+        self.convert_to_pdf_with_powerpoint(ppt_path=full_path, pdf_path=full_path.replace(".pptx", ".pdf"),os_name=os_name)
 
 
     def init_pptx(self, theme_path: str = PPT_MODE_DIR + "1") -> None:
@@ -160,24 +159,28 @@ class PptGenerator:
             for child in heading.children:
                 self.traverse_tree(child)
 
-    def convert_to_pdf_with_powerpoint(self, ppt_path: str, pdf_path: str)->None:
+    def convert_to_pdf_with_powerpoint(self, ppt_path: str, pdf_path: str, os_name: str)->None:
         # AppleScript to open PPT, save as PDF, and close
-        applescript = f'''
-        tell application "Microsoft PowerPoint"
-            try
-                set pptPath to POSIX file "{ppt_path}" as string
-                open pptPath
-                set theDoc to active presentation
-                set pdfPath to POSIX file "{pdf_path}" as string
-                save theDoc in pdfPath as save as PDF
-                close theDoc saving no
-            on error errMsg number errNum
-                display dialog "Error: " & errMsg & " Error Number: " & errNum
-            end try
-        end tell
-        '''
-        # Run the AppleScript
-        subprocess.run(["osascript", "-e", applescript], check=True)
+        if os_name == "macOS":
+            applescript = f'''
+            tell application "Microsoft PowerPoint"
+                try
+                    set pptPath to POSIX file "{ppt_path}" as string
+                    open pptPath
+                    set theDoc to active presentation
+                    set pdfPath to POSIX file "{pdf_path}" as string
+                    save theDoc in pdfPath as save as PDF
+                    close theDoc saving no
+                on error errMsg number errNum
+                    display dialog "Error: " & errMsg & " Error Number: " & errNum
+                end try
+            end tell
+            '''
+            # Run the AppleScript
+            subprocess.run(["osascript", "-e", applescript], check=True)
+        elif os_name == "Windows":
+            from ppt_generator.windows_ppt2pdf import win_ppt2pdf
+            win_ppt2pdf(ppt_path, pdf_path)
 
 class MarkdownCategory:
     TITLE = "#"
