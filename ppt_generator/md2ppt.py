@@ -178,9 +178,12 @@ class PptGenerator:
             '''
             # Run the AppleScript
             subprocess.run(["osascript", "-e", applescript], check=True)
-        elif os_name == "Windows":
-            from ppt_generator.windows_ppt2pdf import win_ppt2pdf
-            win_ppt2pdf(ppt_path, pdf_path)
+        else:
+            try:
+                from ppt_generator.windows_ppt2pdf import win_ppt2pdf
+                win_ppt2pdf(ppt_path, pdf_path)
+            except:
+                pass
 
 class MarkdownCategory:
     TITLE = "#"

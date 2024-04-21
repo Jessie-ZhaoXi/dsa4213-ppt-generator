@@ -54,3 +54,6 @@ zipp==3.18.1 ; python_version >= "3.8" and python_version < "3.10"
 tqdm
 toml
 Levenshtein
+Spire.PDF
+Spire.Presentation
+pyngrok
