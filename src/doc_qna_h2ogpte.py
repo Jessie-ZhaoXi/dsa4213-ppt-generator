@@ -151,18 +151,24 @@ class H2OGPTEClient:
                 msg = article_md.generate_md(
                     path=MD_DIR, opinion=instruction, generate_instruct = generate_instruct
                 )
-                md_content = article_md.combine_mds(MD_DIR, "attention")
-                image_mapping_dic = generate_ppt_image_mapping(IMG_DESCRIPTION_DIC_PATH, md_content, self.client)
-                
-                # Generate the PPT
-                for i in range(1, 3):  # generate two modes of ppt
-                    PptGenerator(
-                        self.client,
-                        image_mapping_dic,
-                        md_content,
-                        PPT_MODE_DIR + str(i),
-                        save_path=f"{PPT_DIR}Presentation_mode_{str(i)}.pptx",
-                    )
+                if msg != "Please give a more relavant instruction":
+                    md_content = article_md.combine_mds(MD_DIR, "attention")
+                    image_mapping_dic = generate_ppt_image_mapping(IMG_DESCRIPTION_DIC_PATH, md_content, self.client)
+
+                    if not os.path.exists(PPT_DIR):
+                         # If it doesn't exist, create it
+                         os.makedirs(PPT_DIR)
+                         print(f"Directory '{PPT_DIR}' created successfully.")
+                    
+                    # Generate the PPT
+                    for i in range(1, 3):  # generate two modes of ppt
+                        PptGenerator(
+                            self.client,
+                            image_mapping_dic,
+                            md_content,
+                            PPT_MODE_DIR + str(i),
+                            save_path=f"{PPT_DIR}Presentation_mode_{str(i)}.pptx",
+                        )
                 print("PPT generation completed successfully.")
                 return msg
         except Exception as e:

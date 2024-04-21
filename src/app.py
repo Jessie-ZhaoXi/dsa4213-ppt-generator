@@ -117,7 +117,7 @@ async def generate_ppt(q: Q, instruction: str):
         # Ensure `generate_ppt` method exists and is properly defined to handle the instruction.
         if hasattr(q.app.h2ogpte, 'generate_ppt'):
             msg = q.app.h2ogpte.generate_ppt(instruction, q.client.collection_request_id)
-            await refresh_ppt_preview(q, local_path = './my_ppts/Presentation_mode_2.pdf')
+            await refresh_ppt_preview(q, local_path = './my_ppts/Presentation_mode_1.pdf')
             preview_path = q.client.remote_preview_path
             text_heading = "<font size=4><b>{}</b></font>"
             data = q.client.texts['questions_data']
