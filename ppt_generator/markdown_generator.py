@@ -540,6 +540,7 @@ class MarkdownGenerator:
         # Assuming response format is a string that needs parsing
         response_elements = response.strip("[]").replace("'", "").split(',')
         category = response_elements[0].strip().lower()
+        print(f"Category: {category}")
 
         if category in ['revise', 'delete'] and len(response_elements) > 1:
             page_number = int(response_elements[1].strip())

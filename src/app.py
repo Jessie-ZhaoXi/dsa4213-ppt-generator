@@ -66,15 +66,20 @@ async def questions(q: Q):
     '''
     data = q.client.texts['questions_data']
     question_prompt = data['Question'][int(q.client.questions[0])]
-    #await on_generating(q, question_prompt)
-    print(f'question_prompt: {question_prompt}')
-    await generate_ppt(q, question_prompt)
+    await on_generating(q, question_prompt)
+    #print(f'question_prompt: {question_prompt}')
+    #await generate_ppt(q, question_prompt)
 
 
 async def on_generating(q: Q, question_prompt: str):
     q.page["card_1"].data += [question_prompt, True]
     await q.page.save()
-    output = await q.run(q.client.qnamanager.answer_question, q, question_prompt, q.client.path)
+
+    await generate_ppt(q, question_prompt)
+
+    #q.page["card_1"].data += [f"Your slides have been generated and saved to local according to {question_prompt}", True]
+    #await q.page.save()
+#    output = await q.run(q.client.qnamanager.answer_question, q, question_prompt, q.client.path)
 
 
 @on(arg='english')
@@ -97,7 +102,7 @@ async def file_upload(q: Q):
                 q.client.path = local_path
                 # ingest the file to the collection and save the MarkdownGenerator object in q.app.h2ogpte.article_md
                 await q.run(q.app.h2ogpte.ingest_filepath, q.client.path, q.client.collection_request_id)
-                print("q.app.h2ogpte.article_md", q.app.h2ogpte.article_md)
+                #print("q.app.h2ogpte.article_md", q.app.h2ogpte.article_md)
                 await get_home_items(q, flag="uploaded")
         await q.page.save()
     except:
@@ -125,12 +130,18 @@ async def file_upload(q: Q):
 async def generate_ppt(q: Q, instruction: str):
     try:
         print("Generating PPT...")
-        await q.run(q.app.h2ogpte.generate_ppt, instruction)
+        # Ensure `generate_ppt` method exists and is properly defined to handle the instruction.
+        if hasattr(q.app.h2ogpte, 'generate_ppt'):
+            await q.app.h2ogpte.generate_ppt(instruction, q.client.collection_request_id)
+            q.page["card_1"].data += ["PPT generation successful.", True]
+        else:
+            q.page["card_1"].data += ["PPT generation method not found in the client.", True]
     except Exception as e:
         print(f"Error during PPT generation: {e}")  # Log the exception to the console
-        q.page['meta'].dialog = None
-        await get_home_items(q, flag="home")
+        q.page["card_1"].data += [f"Failed to generate PPT: {e}", True]
+    finally:
         await q.page.save()
+
 
 
 
