@@ -54,8 +54,8 @@ async def initialize_app(q: Q):
 
 
 @on()
-async def chatbot(q: Q):
-    await on_generating(q, q.client.chatbot)
+async def chatbot_ppter(q: Q):
+    await on_generating(q, q.client.chatbot_ppter)
 
 
 @on()
