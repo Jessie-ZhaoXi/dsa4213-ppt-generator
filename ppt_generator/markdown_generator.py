@@ -517,17 +517,18 @@ class MarkdownGenerator:
         print(f"Combined document saved to {output_path}")
         return combined_content
         
-    def update_md(self, path, opinion):
+    def generate_md(self, path, opinion):
         """
         Update the markdown content based on the provided opinion.
         Ask the LLM to categorize the opinion and return the category along with any relevant details in a structured format.
         If the action involves 'revise' or 'delete', include the page number; otherwise, return an empty string for the detail.
         """
         prompt = f"""
-        Analyze the following user input: '{opinion}'. Categorize the input  into 'revise', 'delete', 'regenerate', or 'other'.
+        Analyze the following user input: '{opinion}'. Categorize the input  into 'revise', 'delete', 'regenerate', 'first_generate', or 'other'.
         'revise' means revise the certain page based on the opinion.
         'delete' means delete the certain page based on the opinion.
         'regenerate' means regenerate the whole markdown file based on the opinion.
+        'first_generate' means generate the whole markdown file based on the opinion.
         'other' means other operations that do not fall into the above categories.
         Return the response in the following format:
         - If the category is 'revise' or 'delete', format should be: ['category', 'page number'], here 'page number' refers to the page number to be revised or deleted.
@@ -549,7 +550,7 @@ class MarkdownGenerator:
                 self._delete_md(page_number, path)
                 return f"deleted page {page_number}"
         else:
-            if category == 'regenerate':
+            if category == 'regenerate' or category == 'first_generate':
                 self.generate_md_artical(path, instruction=opinion)
                 return "Regenerating the slides"
             else:
