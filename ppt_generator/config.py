@@ -20,7 +20,8 @@ IMG_DESCRIPTION_DIC_PATH = 'data/image_title_description_mapping.json'
 class Settings(BaseSettings):
     H2OGPTE_API_TOKEN: str = ""
     H2OGPTE_URL: str = "https://h2ogpte.genai.h2o.ai"
-    COLLECTION_NAME: str = "dankai test use"
+    COLLECTION_NAME: str = "Supersonic Rocketship"
+    LLM: str = "gpt-4-1106-preview"
 
     class Config:
         env_file = ".env"  # The file to read environment variables from

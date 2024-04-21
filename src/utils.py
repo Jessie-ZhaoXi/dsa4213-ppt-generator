@@ -113,7 +113,7 @@ async def get_questions(q):
     text_heading = "<font size=4><b>{}</b></font>"
     data = q.client.texts['questions_data']
     table_name = q.client.texts['table_name']
-    initial_petition = q.client.texts['initial_petition']
+    initial_temp_view = q.client.texts['initial_temp_view']
     df = pd.DataFrame(data)
     df.rename(columns={'Question': table_name}, inplace=True)
     # print('q.client.path', q.client.path)
@@ -126,7 +126,7 @@ async def get_questions(q):
     print("### calling get_questions:: preview_path:" + preview_path)
     items = [
         ui_table_from_df(df, name='questions', sortables=[table_name], link_col=table_name, min_widths=min_widths, height= '200px'),
-        ui.text(text_heading.format(initial_petition)),
+        ui.text(text_heading.format(initial_temp_view)),
         ui.text(f"""<object data="{preview_path}" type="application/pdf" width="100%" height="450px"></object>""")
         
     ]

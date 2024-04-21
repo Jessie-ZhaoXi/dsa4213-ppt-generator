@@ -65,8 +65,8 @@ class H2OGPTEClient:
                 self.client.delete_collections(collection_ids)
         return     
 
-    def drop_collections_no_temas(self):
-        logging.info(f'Dropping all old collections created except temas_stf')
+    def drop_collections_no_rocket(self):
+        logging.info(f'Dropping all old collections created except supersonic_rocket_ppt_generator')
         json_file_path = "./collection_list.json"
         try:
             with open(json_file_path, "r") as json_file:
@@ -75,7 +75,7 @@ class H2OGPTEClient:
             existing_collections = []
         
         collections_h2ogpte = self.client.list_recent_collections(0, 100)
-        collections_h2ogpte_ids = [c.id for c in collections_h2ogpte if c.name != 'temas_stf']
+        collections_h2ogpte_ids = [c.id for c in collections_h2ogpte if c.name != 'supersonic_rocket_ppt_generator']
         for collection in existing_collections:
             collection_id = collection['collection_id']
             n_days = (datetime.datetime.now() - datetime.datetime.strptime(collection['creation_date'], '%Y-%m-%d %H:%M:%S.%f')).days
@@ -210,12 +210,12 @@ class H2OGPTEClient:
 
 
 class QnAManager:
-    def __init__(self, client, llm, collection_request_id, collection_stf_id, language):
+    def __init__(self, client, llm, collection_request_id, collection_pdf_id, language):
         from .prompts import prompts_eng
         self.client = client.client
         self.llm = llm
         self.collection_request_id = collection_request_id
-        self.collection_stf_id = collection_stf_id
+        self.collection_pdf_id = collection_pdf_id
         self.prompts = prompts_eng
         self.language = language
         self.json_file_path = "./history.json"
@@ -228,16 +228,13 @@ class QnAManager:
             response = 'Not able to construct an answer at the moment. Please contact the app administrators.'
         return response
 
-    async def _chat(self, q, question_prompt, open_question, stf_check):
-        if stf_check == True:
-            logging.info(f'Finding Supreme Court Theme')
-            response = await self.stream_answer(q, question_prompt, rag_type="rag", stf_check=True)
-        elif open_question == True:
+    async def _chat(self, q, question_prompt, open_question):
+        if open_question == True:
             logging.info(f'Open question')
-            response = await self.stream_answer(q, question_prompt, rag_type="llm_only", stf_check=False)
+            response = await self.stream_answer(q, question_prompt, rag_type="llm_only")
         else:
-            logging.info(f'Searching for answer in the petition')
-            response = await self.stream_answer(q, question_prompt, rag_type="rag", stf_check=False)
+            logging.info(f'Searching for answer in the pdf')
+            response = await self.stream_answer(q, question_prompt, rag_type="rag")
         return response
     
     def _get_full_summary(self, collection_id):
@@ -274,7 +271,7 @@ class QnAManager:
                     break
         return check_exist, res
     
-    def chat_session_stream(self, q, prompt, rag_type="rag", stf_check=False):
+    def chat_session_stream(self, q, prompt, rag_type="rag"):
         """
         Send the user's message to the LLM and save the response
         """
@@ -285,7 +282,6 @@ class QnAManager:
             q.client.chatbot_interaction.update_response(message, q)
 
         collection = self.collection_request_id
-        if stf_check == True: collection = self.collection_stf_id
         chat_session_id = self.client.create_chat_session(collection)
         args = {
             "system_prompt": self.prompts['system_prompt'],
@@ -308,12 +304,12 @@ class QnAManager:
         q.page[chatbot_name].data[-1] = [q.client.chatbot_interaction.content_to_show, False]
         await q.page.save()
 
-    async def stream_answer(self, q, question_prompt, rag_type="rag", stf_check=False):
+    async def stream_answer(self, q, question_prompt, rag_type="rag"):
         q.client.chatbot_interaction = ChatBotInteraction(user_message=question_prompt, q=q)
         q.page['card_1'].data += [q.client.chatbot_interaction.content_to_show, False]
         try:
             update_ui = asyncio.ensure_future(self.stream_updates_to_ui(q, 'card_1'))
-            await q.run(self.chat_session_stream, q, question_prompt, rag_type, stf_check)
+            await q.run(self.chat_session_stream, q, question_prompt, rag_type)
             await update_ui
             response = q.client.chatbot_interaction.content_to_show
             return response
@@ -355,7 +351,7 @@ class QnAManager:
         else:
             # if the question is a regular question
             question_prompt = self.prompts['ppt_prompt'].format(question_prompt)
-            res = await self._chat(q, question_prompt, open_question=open_ques, stf_check=False)
+            res = await self._chat(q, question_prompt, open_question=open_ques)
 
         if summary_task:
             with open(self.json_file_path, "r") as json_file:

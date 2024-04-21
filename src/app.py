@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO)
 collection_name=H2OGPTE_SETTINGS.COLLECTION_NAME
 collection_description="created for DSA4213 project"
 
-llm = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+llm = H2OGPTE_SETTINGS.LLM
 
 @app("/")
 async def serve(q: Q):
@@ -123,12 +123,12 @@ async def generate_ppt(q: Q, instruction: str):
             data = q.client.texts['questions_data']
             table_name = q.client.texts['table_name']
             min_widths = {table_name: '350px'}
-            initial_petition = q.client.texts['initial_petition']
+            initial_temp_view = q.client.texts['initial_temp_view']
             df = pd.DataFrame(data)
             df.rename(columns={'Question': table_name}, inplace=True)
             items = [
                 ui_table_from_df(df, name='questions', sortables=[table_name], link_col=table_name, min_widths=min_widths, height= '200px'),
-                ui.text(text_heading.format(initial_petition)),
+                ui.text(text_heading.format(initial_temp_view)),
                 ui.text(f"""<object data="{preview_path}" type="application/pdf" width="100%" height="450px"></object>""")
                 ]
             # items = await get_questions(q)

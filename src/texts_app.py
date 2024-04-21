@@ -22,7 +22,7 @@ texts_app_en = {
     'table_name':'PPT Generater',
     'table_header':'Create a PPT in minutes',
     'table_subtitle':'PPT Generater',
-    'initial_petition':'Temp View',
+    'initial_temp_view':'Temp View',
     'dialog':{
         'title':'Uploading dataset...',
         'caption':'Be Patient...',
