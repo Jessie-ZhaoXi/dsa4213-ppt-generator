@@ -34,6 +34,7 @@ async def serve(q: Q):
         await q.page.save()
         q.client.initialized = True
         
+    q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)    
     copy_expando(q.args, q.client)
     logging.debug('q.args: %s', q.args)
     await run_on(q)
@@ -44,6 +45,9 @@ async def initialize_app(q: Q):
                 "address": H2OGPTE_SETTINGS.H2OGPTE_URL,
                 "api_key": H2OGPTE_SETTINGS.H2OGPTE_API_TOKEN,
             }
+    q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
+    q.app.collection_id = q.app.h2ogpte.create_collection(collection_name, collection_description)
+    q.client.collection_request_id = q.app.h2ogpte.create_collection(collection_name, collection_description)
     q.app.loader, = await q.site.upload([LOADING_GIF])
     q.app.logo, = await q.site.upload([COMPANY_LOGO])
     q.app.backgroud, = await q.site.upload([BACKGROUND_IMAGE])
@@ -126,10 +130,6 @@ async def file_upload(q: Q):
                 local_path = await q.site.download(path, './uploaded_files')
                 print(f'******######downloaded:{local_path}')
                 q.client.path = local_path
-                q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
-                q.app.collection_id = q.app.h2ogpte.create_collection(collection_name, collection_description)
-                q.client.collection_request_id = q.app.h2ogpte.create_collection(collection_name, collection_description)
-                q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)
                 # ingest the file to the collection and save the MarkdownGenerator object in q.app.h2ogpte.article_md
                 await q.run(q.app.h2ogpte.ingest_filepath, q.client.path, q.client.collection_request_id)
                 print(q.app.h2ogpte.article_md)
