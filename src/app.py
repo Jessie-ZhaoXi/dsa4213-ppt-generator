@@ -44,9 +44,6 @@ async def initialize_app(q: Q):
                 "address": H2OGPTE_SETTINGS.H2OGPTE_URL,
                 "api_key": H2OGPTE_SETTINGS.H2OGPTE_API_TOKEN,
             }
-    q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
-    q.app.collection_id = q.app.h2ogpte.create_collection(collection_name, collection_description)
-    # q.app.h2ogpte.ingest_file_folder('temas_stf', q.app.collection_id)
     q.app.loader, = await q.site.upload([LOADING_GIF])
     q.app.logo, = await q.site.upload([COMPANY_LOGO])
     q.app.backgroud, = await q.site.upload([BACKGROUND_IMAGE])
@@ -65,14 +62,15 @@ async def questions(q: Q):
     '''
     data = q.client.texts['questions_data']
     question_prompt = data['Question'][int(q.client.questions[0])]
+    print("check progress 1")
     await on_generating(q, question_prompt)
 
 
 async def on_generating(q: Q, question_prompt: str):
-    q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
-    q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)
+    print("check progress 2")
     q.page["card_1"].data += [question_prompt, True]
     await q.page.save()
+    print("check progress 3")
     output = await q.run(q.client.qnamanager.answer_question, q, question_prompt, q.client.path)
 
 
@@ -129,6 +127,7 @@ async def file_upload(q: Q):
                 print(f'******######downloaded:{local_path}')
                 q.client.path = local_path
                 q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
+                q.app.collection_id = q.app.h2ogpte.create_collection(collection_name, collection_description)
                 q.client.collection_request_id = q.app.h2ogpte.create_collection(collection_name, collection_description)
                 q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)
                 # ingest the file to the collection and save the MarkdownGenerator object in q.app.h2ogpte.article_md

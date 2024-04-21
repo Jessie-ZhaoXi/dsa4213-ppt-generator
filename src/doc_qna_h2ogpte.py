@@ -118,10 +118,10 @@ class H2OGPTEClient:
             print("Generating markdown file ...")
             article_md = MarkdownGenerator(session, min_sub_idea_num = 2, max_sub_idea_num = 6)
             print("create markdown generator")
-            article_md.generate_md_artical(
-                save_path=MD_DIR, instruction=None
-            )
-            md_content = article_md.combine_mds(MD_DIR, "attention")
+            #article_md.generate_md_artical(
+            #    save_path=MD_DIR, instruction=None
+            #)
+            #md_content = article_md.combine_mds(MD_DIR, "attention")
             # add MarkdownGenerator object
             self.article_md = article_md
             # image_mapping_dic = generate_ppt_image_mapping(IMG_DESCRIPTION_DIC_PATH, md_content, self.client)
@@ -135,6 +135,24 @@ class H2OGPTEClient:
             #         save_path=PPT_DIR + "attention" + "_mode" + str(i) + ".pptx",
             #     )
         return
+    
+    def generate_ppt(self, instruction):
+        print("Generating markdown file ...")
+        self.article_md.generate_md_artical(
+            save_path=MD_DIR, instruction=instruction
+        )
+        md_content = self.article_md.combine_mds(MD_DIR, "attention")
+        image_mapping_dic = generate_ppt_image_mapping(IMG_DESCRIPTION_DIC_PATH, md_content, self.client)
+    # Generate the ppt
+        for i in range(1, 3):  # generate two modes of ppt
+            PptGenerator(
+                self.client,
+                image_mapping_dic,
+                md_content,
+                PPT_MODE_DIR + str(i),
+                save_path=PPT_DIR + "attention" + "_mode" + str(i) + ".pptx",
+            )
+
 
     def _get_collection_chunks(self, collection_id):
         chunk_sizes = 80

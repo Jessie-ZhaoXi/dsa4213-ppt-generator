@@ -18,9 +18,9 @@ LLM_ARGS = dict(temperature=0, do_sample=False, top_k=1, seed=4213)
 IMG_DESCRIPTION_DIC_PATH = 'data/image_title_description_mapping.json'
 
 class Settings(BaseSettings):
-    H2OGPTE_API_TOKEN: str = ""
+    H2OGPTE_API_TOKEN: str = "sk-ymTiqAH7mEaliB9bstjkpcvj4qsnsMEaG8OD78KUzIdMjOr8"
     H2OGPTE_URL: str = "https://h2ogpte.genai.h2o.ai"
-    COLLECTION_NAME: str = "supersonic_rocket_ppt_generator"
+    COLLECTION_NAME: str = "dankai test use"
 
     class Config:
         env_file = ".env"  # The file to read environment variables from
