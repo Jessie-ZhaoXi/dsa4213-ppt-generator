@@ -15,9 +15,9 @@ texts_app_en = {
         'heading':'Upload Files'
         },
     'questions_data':{'Question': [
-            'Generate an outline for about 10-15 slides',
-            'Generate a summary for the introduction',
-            'Generate a summary for the second paragragh',
+            'Generate me a three sub-ideas markdown file',
+            'Generate a summary of the article',
+            'Generate me a four sub-ideas markdown file',
         ]},
     'table_name':'PPT Generater',
     'table_header':'Create a PPT in minutes',

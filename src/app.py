@@ -66,15 +66,14 @@ async def questions(q: Q):
     '''
     data = q.client.texts['questions_data']
     question_prompt = data['Question'][int(q.client.questions[0])]
-    print("check progress 1")
-    await on_generating(q, question_prompt)
+    #await on_generating(q, question_prompt)
+    print(f'question_prompt: {question_prompt}')
+    await generate_ppt(q, question_prompt)
 
 
 async def on_generating(q: Q, question_prompt: str):
-    print("check progress 2")
     q.page["card_1"].data += [question_prompt, True]
     await q.page.save()
-    print("check progress 3")
     output = await q.run(q.client.qnamanager.answer_question, q, question_prompt, q.client.path)
 
 
@@ -84,40 +83,6 @@ async def set_english(q: Q):
     q.client.language = 'en'
     await get_home_items(q, flag="home")
     await q.page.save()
-
-
-# @on(arg='Chinese')
-# async def set_portuguese(q: Q):
-#     q.client.texts = texts_app_ptbr
-#     q.client.language = 'cn'
-#     await get_home_items(q, flag="home")
-#     await q.page.save()
-
-# @on()
-# async def submit_url(q: Q):
-#     if q.client.url == "":
-#         await get_home_items(q, flag="home")
-#         await q.page.save()
-#     else:
-#         try:
-#             filename = q.client.url.split("/")[-1]
-#             q.client.path = Path('pdf/' + filename)
-#             await loading(q)
-#             response = requests.get(q.client.url)
-#             q.client.path.write_bytes(response.content)
-#             name_collection_peticao = f'collection_{filename}'
-#             description_collection_peticao = f'Collection for {filename}'
-#             q.app.h2ogpte = H2OGPTEClient(q.app.h2ogpte_keys['address'], q.app.h2ogpte_keys['api_key'])
-#             q.client.collection_request_id = q.app.h2ogpte.create_collection(name_collection_peticao, description_collection_peticao)
-#             q.client.qnamanager = QnAManager(q.app.h2ogpte, llm, q.client.collection_request_id, q.app.collection_id, q.client.language)
-#             await q.run(q.app.h2ogpte.ingest_url, q.client.url, q.client.collection_request_id)
-#             q.page['meta'].dialog = None
-#             await get_home_items(q, flag="uploaded")
-#             await q.page.save()
-#             delete_filepath(q.client.path)
-#         except:
-#             await get_home_items(q, flag="home")
-#             await q.page.save()
 
 
 @on()
@@ -132,7 +97,7 @@ async def file_upload(q: Q):
                 q.client.path = local_path
                 # ingest the file to the collection and save the MarkdownGenerator object in q.app.h2ogpte.article_md
                 await q.run(q.app.h2ogpte.ingest_filepath, q.client.path, q.client.collection_request_id)
-                print(q.app.h2ogpte.article_md)
+                print("q.app.h2ogpte.article_md", q.app.h2ogpte.article_md)
                 await get_home_items(q, flag="uploaded")
         await q.page.save()
     except:
@@ -156,6 +121,17 @@ async def file_upload(q: Q):
     #     q.page['meta'].dialog = None
     #     await get_home_items(q, flag="home")
     #     await q.page.save()
+
+async def generate_ppt(q: Q, instruction: str):
+    try:
+        print("Generating PPT...")
+        await q.run(q.app.h2ogpte.generate_ppt, instruction)
+    except Exception as e:
+        print(f"Error during PPT generation: {e}")  # Log the exception to the console
+        q.page['meta'].dialog = None
+        await get_home_items(q, flag="home")
+        await q.page.save()
+
 
 
 @on()

@@ -138,8 +138,8 @@ class H2OGPTEClient:
     
     def generate_ppt(self, instruction):
         print("Generating markdown file ...")
-        self.article_md.generate_md_artical(
-            save_path=MD_DIR, instruction=instruction
+        self.article_md.generate_md(
+            path=MD_DIR, opinion=instruction
         )
         md_content = self.article_md.combine_mds(MD_DIR, "attention")
         image_mapping_dic = generate_ppt_image_mapping(IMG_DESCRIPTION_DIC_PATH, md_content, self.client)
